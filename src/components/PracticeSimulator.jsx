@@ -1,410 +1,542 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-/* ─── Initial state ─── */
+const BASE = import.meta.env.BASE_URL
+
+/* ─── Initial data ─── */
 const INIT_FILES = [
-  { id:'photo',    name:'photo.png',     icon:'🖼️', ext:'png',  loc:'desktop' },
-  { id:'music',    name:'music.mp3',     icon:'🎵', ext:'mp3',  loc:'desktop' },
-  { id:'homework', name:'homework.docx', icon:'📝', ext:'docx', loc:'desktop' },
-  { id:'old',      name:'old.txt',       icon:'📄', ext:'txt',  loc:'desktop' },
+  { id:'photo',    name:'photo.png',     icon:'img',   loc:'desktop', ext:'png'  },
+  { id:'music',    name:'music.mp3',     icon:'audio', loc:'desktop', ext:'mp3'  },
+  { id:'homework', name:'homework.docx', icon:'word',  loc:'desktop', ext:'docx' },
+  { id:'old',      name:'old.txt',       icon:'txt',   loc:'desktop', ext:'txt'  },
 ]
 const INIT_FOLDERS = [
-  { id:'docs',    name:'Документы', icon:'📁' },
-  { id:'photos',  name:'Фото',      icon:'📁' },
-  { id:'music-f', name:'Музыка',    icon:'📁' },
+  { id:'docs',    name:'Документы' },
+  { id:'photos',  name:'Фото'      },
+  { id:'music-f', name:'Музыка'    },
 ]
 
-/* ─── Tasks ─── */
 const TASKS = [
-  {
-    id:'click-docs',
-    text:'Нажми на папку «Документы»',
-    hints:['Папки выглядят как жёлтые 📁','Найди «Документы» на рабочем столе','Просто кликни на иконку 📁 Документы'],
-    points:10,
-    check:(a) => a.type==='click-folder' && a.id==='docs',
-  },
-  {
-    id:'open-photos',
-    text:'Открой папку «Фото» (двойной клик)',
-    hints:['Двойной клик — два быстрых нажатия','Найди папку «Фото»','Дважды кликни на 📁 Фото'],
-    points:10,
-    check:(a) => a.type==='open-folder' && a.id==='photos',
-  },
-  {
-    id:'drag-photo',
-    text:'Перетащи «photo.png» в папку «Фото»',
-    hints:['Удержи кнопку мыши на файле, потяни к папке','photo.png — иконка 🖼️','Потяни 🖼️ photo.png на папку 📁 Фото'],
-    points:15,
-    check:(a) => a.type==='drop-folder' && a.fileId==='photo' && a.folderId==='photos',
-  },
-  {
-    id:'drag-music',
-    text:'Перетащи «music.mp3» в папку «Музыка»',
-    hints:['Нажми, удержи, потяни, отпусти','music.mp3 — иконка 🎵','Потяни 🎵 music.mp3 на 📁 Музыка'],
-    points:15,
-    check:(a) => a.type==='drop-folder' && a.fileId==='music' && a.folderId==='music-f',
-  },
-  {
-    id:'drag-homework',
-    text:'Перетащи «homework.docx» в папку «Документы»',
-    hints:['Все .docx — это документы','homework.docx — иконка 📝','Потяни 📝 homework.docx на 📁 Документы'],
-    points:15,
-    check:(a) => a.type==='drop-folder' && a.fileId==='homework' && a.folderId==='docs',
-  },
-  {
-    id:'drag-trash',
-    text:'Перетащи «old.txt» в Корзину',
-    hints:['Корзина — иконка 🗑️ внизу рабочего стола','Найди файл old.txt','Потяни 📄 old.txt на 🗑️ Корзина'],
-    points:15,
-    check:(a) => a.type==='drop-trash' && a.fileId==='old',
-  },
-  {
-    id:'restore-file',
-    text:'Открой Корзину и восстанови «old.txt»',
-    hints:['Дважды кликни на 🗑️ Корзина','В корзине найди old.txt','Нажми кнопку «Восстановить»'],
-    points:15,
-    check:(a) => a.type==='restore' && a.fileId==='old',
-  },
-  {
-    id:'create-folder',
-    text:'Нажми правой кнопкой мыши и создай папку',
-    hints:['Правая кнопка мыши по пустому месту','В меню выбери «Создать папку»','Правый клик → «Создать папку»'],
-    points:15,
-    check:(a) => a.type==='create-folder',
-  },
-  {
-    id:'ctrl-c',
-    text:'Выбери «homework.docx» и нажми Ctrl+C',
-    hints:['Сначала нажми на файл homework.docx','Когда выбран — удержи Ctrl и нажми C','Клик на 📝 homework.docx → Ctrl+C'],
-    points:10,
-    check:(a) => a.type==='copy' && a.fileId==='homework',
-  },
-  {
-    id:'ctrl-s',
-    text:'Нажми Ctrl+S чтобы сохранить прогресс',
-    hints:['Ctrl+S — это горячая клавиша сохранения','Удержи Ctrl и нажми S','Ctrl + S на клавиатуре'],
-    points:10,
-    check:(a) => a.type==='save',
-  },
+  { id:'click-docs',   text:'Нажми на папку «Документы»',
+    hints:['Папки — жёлтые иконки','Найди «Документы» на рабочем столе','Кликни на 📁 Документы'], points:10,
+    check:(a) => a.type==='click-folder' && a.id==='docs' },
+  { id:'open-photos',  text:'Открой папку «Фото» двойным кликом',
+    hints:['Двойной клик = два быстрых нажатия','Найди папку «Фото»','Дважды кликни на 📁 Фото'], points:10,
+    check:(a) => a.type==='open-folder' && a.id==='photos' },
+  { id:'drag-photo',   text:'Перетащи «photo.png» в папку «Фото»',
+    hints:['Удержи кнопку мыши и потяни файл к папке','photo.png — иконка с горой 🏔️','Потяни photo.png на папку Фото'], points:15,
+    check:(a) => a.type==='drop-folder' && a.fileId==='photo' && a.folderId==='photos' },
+  { id:'drag-music',   text:'Перетащи «music.mp3» в папку «Музыка»',
+    hints:['Нажми, удержи, потяни, отпусти','music.mp3 — иконка с нотой 🎵','Потяни music.mp3 на папку Музыка'], points:15,
+    check:(a) => a.type==='drop-folder' && a.fileId==='music' && a.folderId==='music-f' },
+  { id:'drag-homework', text:'Перетащи «homework.docx» в «Документы»',
+    hints:['.docx — это документ Word','homework.docx — синяя иконка W','Потяни homework.docx на Документы'], points:15,
+    check:(a) => a.type==='drop-folder' && a.fileId==='homework' && a.folderId==='docs' },
+  { id:'drag-trash',   text:'Перетащи «old.txt» в Корзину',
+    hints:['Корзина — на рабочем столе, иконка 🗑️','Найди old.txt','Потяни old.txt на Корзину'], points:15,
+    check:(a) => a.type==='drop-trash' && a.fileId==='old' },
+  { id:'restore',      text:'Открой Корзину и восстанови «old.txt»',
+    hints:['Двойной клик по Корзине','Найди old.txt внутри','Нажми «Восстановить»'], points:15,
+    check:(a) => a.type==='restore' && a.fileId==='old' },
+  { id:'create-folder',text:'Правый клик по рабочему столу → Создать папку',
+    hints:['Нажми ПРАВУЮ кнопку мыши по пустому месту стола','В меню выбери «Создать» → «Папку»','Правый клик → Создать → Папку'], points:15,
+    check:(a) => a.type==='create-folder' },
+  { id:'ctrl-c',       text:'Выдели «homework.docx» и нажми Ctrl+C',
+    hints:['Сначала кликни на homework.docx','Потом удержи Ctrl и нажми C','Клик на файл → Ctrl+C'], points:10,
+    check:(a) => a.type==='copy' && a.fileId==='homework' },
+  { id:'ctrl-s',       text:'Нажми Ctrl+S чтобы сохранить',
+    hints:['Ctrl+S = сохранить','Удержи Ctrl, нажми S','Используй клавиши Ctrl+S'], points:10,
+    check:(a) => a.type==='save' },
 ]
 
-/* ─── Main Component ─── */
+/* ──────────────────────────────────────────
+   File icon SVGs (Windows 10 style)
+────────────────────────────────────────── */
+function FileIcon({ type, size = 40 }) {
+  const s = size
+  if (type === 'folder') return (
+    <img src={`${BASE}assets/folder3d.png`} width={s} height={s} style={{ objectFit:'contain', imageRendering:'auto' }} alt="folder" />
+  )
+  if (type === 'img') return (
+    <svg width={s} height={s} viewBox="0 0 48 48"><rect width="48" height="48" rx="4" fill="#0078d4"/><rect x="4" y="8" width="40" height="32" rx="2" fill="#50e6ff"/><path d="M4 30 L16 18 L26 28 L34 20 L44 30 V40 H4Z" fill="#0078d4" opacity="0.6"/><circle cx="34" cy="16" r="5" fill="#ffe900"/></svg>
+  )
+  if (type === 'audio') return (
+    <svg width={s} height={s} viewBox="0 0 48 48"><rect width="48" height="48" rx="4" fill="#ff8c00"/><path d="M24 8 C15 8, 8 15, 8 24 C8 33, 15 40, 24 40 C33 40, 40 33, 40 24 C40 15 33 8 24 8Z" fill="white" opacity="0.2"/><circle cx="24" cy="24" r="8" fill="white" opacity="0.9"/><circle cx="24" cy="24" r="3" fill="#ff8c00"/><path d="M20 12 L28 12 L28 22 L24 20 L20 22Z" fill="white"/></svg>
+  )
+  if (type === 'word') return (
+    <svg width={s} height={s} viewBox="0 0 48 48"><rect width="48" height="48" rx="4" fill="#2b7cd3"/><rect x="8" y="6" width="32" height="36" rx="2" fill="white"/><text x="14" y="32" fontSize="22" fontWeight="bold" fill="#2b7cd3" fontFamily="Arial">W</text></svg>
+  )
+  if (type === 'txt') return (
+    <svg width={s} height={s} viewBox="0 0 48 48"><rect width="48" height="48" rx="4" fill="#f0f0f0"/><rect x="8" y="4" width="28" height="36" rx="2" fill="white" stroke="#d4d4d4"/><path d="M36 4 L36 14 L44 14" fill="none" stroke="#d4d4d4"/><path d="M36 4 L44 14 L44 40 Q44 44 40 44 L8 44 Q4 44 4 40" fill="#e0e0e0"/><line x1="12" y1="18" x2="32" y2="18" stroke="#888" strokeWidth="1.5"/><line x1="12" y1="23" x2="32" y2="23" stroke="#888" strokeWidth="1.5"/><line x1="12" y1="28" x2="24" y2="28" stroke="#888" strokeWidth="1.5"/></svg>
+  )
+  if (type === 'pc') return (
+    <img src={`${BASE}assets/computer3d.png`} width={s} height={s} style={{ objectFit:'contain' }} alt="PC" />
+  )
+  if (type === 'trash-empty') return (
+    <svg width={s} height={s} viewBox="0 0 48 48"><path d="M12 14 L36 14 L34 42 Q34 44 32 44 L16 44 Q14 44 14 42Z" fill="#c8c8c8"/><rect x="8" y="12" width="32" height="4" rx="2" fill="#a0a0a0"/><rect x="18" y="6" width="12" height="6" rx="2" fill="#a0a0a0"/><line x1="20" y1="20" x2="20" y2="38" stroke="#a0a0a0" strokeWidth="2"/><line x1="24" y1="20" x2="24" y2="38" stroke="#a0a0a0" strokeWidth="2"/><line x1="28" y1="20" x2="28" y2="38" stroke="#a0a0a0" strokeWidth="2"/></svg>
+  )
+  if (type === 'trash-full') return (
+    <svg width={s} height={s} viewBox="0 0 48 48"><path d="M12 14 L36 14 L34 42 Q34 44 32 44 L16 44 Q14 44 14 42Z" fill="#787878"/><rect x="8" y="12" width="32" height="4" rx="2" fill="#606060"/><rect x="18" y="6" width="12" height="6" rx="2" fill="#606060"/><path d="M16 18 L22 24 M22 18 L16 24" stroke="white" strokeWidth="2"/><path d="M26 18 L32 24 M32 18 L26 24" stroke="white" strokeWidth="2"/></svg>
+  )
+  return <span style={{ fontSize: s * 0.7 }}>📄</span>
+}
+
+/* ──────────────────────────────────────────
+   Windows 10 wallpaper — white + purple wave
+────────────────────────────────────────── */
+function Win10Wallpaper() {
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: '#e8e4f3' }}>
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#c7b8ea" stopOpacity="0.6"/>
+            <stop offset="100%" stopColor="#7b6be4" stopOpacity="0.95"/>
+          </linearGradient>
+          <linearGradient id="wg2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#9b8fd4" stopOpacity="0.5"/>
+            <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.4"/>
+          </linearGradient>
+        </defs>
+        {/* Main large wave ribbon */}
+        <path d="M 1440 0 C 1100 0, 820 180, 920 420 C 1020 660, 740 780, 980 900 L 1440 900 Z"
+          fill="url(#wg1)"/>
+        {/* Secondary wave */}
+        <path d="M 1440 120 C 1160 80, 900 280, 1000 500 C 1100 720, 860 840, 1100 900 L 1440 900 Z"
+          fill="url(#wg2)"/>
+        {/* Highlight ribbon */}
+        <path d="M 1440 250 C 1200 220, 1050 380, 1120 580 C 1190 780, 1000 880, 1200 900 L 1440 900 Z"
+          fill="white" opacity="0.12"/>
+      </svg>
+      {/* Subtle grid dots like Win10 */}
+      <div className="absolute inset-0" style={{
+        backgroundImage: 'radial-gradient(circle, rgba(123,107,228,0.07) 1px, transparent 1px)',
+        backgroundSize: '32px 32px',
+      }}/>
+    </div>
+  )
+}
+
+/* ──────────────────────────────────────────
+   WIN10 CONTEXT MENU
+────────────────────────────────────────── */
+function Win10CtxMenu({ menu, onCreateFolder, onPaste, onRefresh, onClose }) {
+  if (!menu) return null
+  const Item = ({ icon, label, shortcut, onClick, divider, sub }) => divider
+    ? <div style={{ height:1, background:'#e5e5e5', margin:'4px 0' }}/>
+    : (
+      <button onClick={() => { onClick?.(); onClose() }}
+        className="w-full text-left flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-[#0078d4] hover:text-white transition-colors rounded-sm"
+        style={{ fontFamily:'Segoe UI,system-ui,sans-serif', fontSize:13, color:'#1a1a1a' }}>
+        <span className="w-5 text-base">{icon}</span>
+        <span className="flex-1">{label}</span>
+        {shortcut && <span className="opacity-50 text-xs">{shortcut}</span>}
+        {sub && <span className="opacity-50">›</span>}
+      </button>
+    )
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onClick={onClose}/>
+      <div style={{
+        position:'fixed', left: menu.x, top: menu.y, zIndex:50,
+        background:'#f9f9f9', border:'1px solid #e0e0e0',
+        borderRadius:4, padding:'4px 0', minWidth:200,
+        boxShadow:'0 8px 32px rgba(0,0,0,0.22)',
+        fontFamily:'Segoe UI,system-ui,sans-serif',
+      }}>
+        {menu.target === 'desktop' ? <>
+          <Item icon="👁️" label="Вид" sub />
+          <Item icon="↕️" label="Сортировать" sub />
+          <Item icon="🔄" label="Обновить" onClick={onRefresh}/>
+          <Item divider />
+          <Item icon="📋" label="Вставить" onClick={onPaste}/>
+          <Item icon="✂️" label="Вставить ярлык"/>
+          <Item icon="↩️" label="Отменить удаление" shortcut="Ctrl+Z"/>
+          <Item divider />
+          <Item icon="➕" label="Создать" sub onClick={onCreateFolder}/>
+          <Item divider />
+          <Item icon="🖥️" label="Параметры экрана"/>
+          <Item icon="🎨" label="Персонализация"/>
+        </> : <>
+          <Item icon="📂" label="Открыть"/>
+          <Item icon="📋" label="Копировать" shortcut="Ctrl+C"/>
+          <Item icon="✂️" label="Вырезать" shortcut="Ctrl+X"/>
+          <Item divider />
+          <Item icon="🗑️" label="Удалить" shortcut="Del"/>
+          <Item icon="✏️" label="Переименовать"/>
+          <Item divider />
+          <Item icon="🔧" label="Свойства"/>
+        </>}
+      </div>
+    </>
+  )
+}
+
+/* ──────────────────────────────────────────
+   DRAGGABLE WINDOW
+────────────────────────────────────────── */
+function Win10Window({ title, icon, onClose, onMinimize, children, defaultX = 120, defaultY = 60, width = 560, height = 380 }) {
+  const [pos, setPos]       = useState({ x: defaultX, y: defaultY })
+  const [drag, setDrag]     = useState(false)
+  const [offset, setOffset] = useState({ x:0, y:0 })
+
+  const onMouseDown = (e) => {
+    if (e.target.closest('button')) return
+    setDrag(true)
+    setOffset({ x: e.clientX - pos.x, y: e.clientY - pos.y })
+  }
+
+  useEffect(() => {
+    if (!drag) return
+    const move = (e) => setPos({ x: e.clientX - offset.x, y: e.clientY - offset.y })
+    const up   = () => setDrag(false)
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseup', up)
+    return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up) }
+  }, [drag, offset])
+
+  return (
+    <motion.div initial={{ scale:0.95, opacity:0 }} animate={{ scale:1, opacity:1 }} exit={{ scale:0.95, opacity:0 }}
+      style={{ position:'fixed', left:pos.x, top:pos.y, width, zIndex:30,
+        boxShadow:'0 8px 40px rgba(0,0,0,0.35)', borderRadius:2, overflow:'hidden', border:'1px solid #c0c0c0' }}>
+      {/* Accent line */}
+      <div style={{ height:3, background:'linear-gradient(90deg,#7b6be4,#a78bfa)' }}/>
+      {/* Title bar */}
+      <div onMouseDown={onMouseDown}
+        style={{ background:'#f3f3f3', height:32, display:'flex', alignItems:'center',
+          padding:'0 8px', cursor:drag?'grabbing':'grab', userSelect:'none',
+          borderBottom:'1px solid #e0e0e0', fontFamily:'Segoe UI,sans-serif', fontSize:13 }}>
+        <span style={{ marginRight:6, fontSize:16 }}>{icon}</span>
+        <span style={{ flex:1, color:'#1a1a1a', fontWeight:400 }}>{title}</span>
+        <button onClick={onMinimize}
+          style={{ width:46, height:32, border:'none', background:'transparent', cursor:'pointer', fontSize:16, color:'#666' }}
+          onMouseOver={e=>e.target.style.background='#e5e5e5'} onMouseOut={e=>e.target.style.background='transparent'}>—</button>
+        <button onClick={onMinimize}
+          style={{ width:46, height:32, border:'none', background:'transparent', cursor:'pointer', fontSize:13, color:'#666' }}
+          onMouseOver={e=>e.target.style.background='#e5e5e5'} onMouseOut={e=>e.target.style.background='transparent'}>□</button>
+        <button onClick={onClose}
+          style={{ width:46, height:32, border:'none', background:'transparent', cursor:'pointer', fontSize:16, color:'#666' }}
+          onMouseOver={e=>{e.target.style.background='#c42b1c';e.target.style.color='white'}}
+          onMouseOut={e=>{e.target.style.background='transparent';e.target.style.color='#666'}}>✕</button>
+      </div>
+      {/* Content */}
+      <div style={{ height: height - 35, background:'white', overflow:'auto', fontFamily:'Segoe UI,sans-serif' }}>
+        {children}
+      </div>
+    </motion.div>
+  )
+}
+
+/* ──────────────────────────────────────────
+   FILE EXPLORER WINDOW
+────────────────────────────────────────── */
+function FileExplorer({ folder, files, allFolders, onClose, onRestore, isTrash }) {
+  const name  = isTrash ? 'Корзина' : folder?.name
+  const items = isTrash ? files : files.filter(f => f.loc === folder?.id)
+
+  return (
+    <Win10Window title={name} icon={isTrash ? '🗑️' : '📁'} onClose={onClose} onMinimize={onClose}
+      defaultX={180} defaultY={80} width={580} height={420}>
+      {/* Toolbar */}
+      <div style={{ background:'#f9f9f9', borderBottom:'1px solid #e5e5e5', padding:'6px 12px', display:'flex', alignItems:'center', gap:8 }}>
+        {['←','→','↑'].map(a => (
+          <button key={a} style={{ width:28, height:26, border:'1px solid #e0e0e0', borderRadius:3, background:'white', cursor:'pointer', fontSize:12 }}>{a}</button>
+        ))}
+        <div style={{ flex:1, background:'white', border:'1px solid #c0c0c0', borderRadius:2, padding:'3px 8px', fontSize:12, color:'#666' }}>
+          › Этот компьютер › {name}
+        </div>
+        <div style={{ background:'white', border:'1px solid #c0c0c0', borderRadius:2, padding:'3px 8px', fontSize:12, color:'#888', minWidth:120 }}>
+          🔍 Поиск в {name}
+        </div>
+      </div>
+      {/* Body */}
+      <div style={{ display:'flex', height:'100%' }}>
+        {/* Left nav */}
+        <div style={{ width:160, background:'#f9f9f9', borderRight:'1px solid #e5e5e5', padding:'8px 0', flexShrink:0 }}>
+          {['🚀 Быстрый доступ','📌 Рабочий стол','⬇️ Загрузки','📁 Документы','🖼️ Изображения','🎵 Музыка','📹 Видео','💻 Этот компьютер'].map(item => (
+            <div key={item} style={{ padding:'5px 12px', fontSize:12, color:'#333', cursor:'pointer' }}
+              onMouseOver={e=>e.target.style.background='#e8e8e8'} onMouseOut={e=>e.target.style.background='transparent'}>
+              {item}
+            </div>
+          ))}
+        </div>
+        {/* Files area */}
+        <div style={{ flex:1, padding:16 }}>
+          {items.length === 0 ? (
+            <div style={{ color:'#999', fontSize:13, textAlign:'center', marginTop:40 }}>Папка пуста</div>
+          ) : (
+            <div style={{ display:'flex', flexWrap:'wrap', gap:16 }}>
+              {items.map(f => (
+                <div key={f.id} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4, width:72, cursor:'pointer', padding:6, borderRadius:4 }}
+                  onMouseOver={e=>e.currentTarget.style.background='#e8f0fe'} onMouseOut={e=>e.currentTarget.style.background='transparent'}>
+                  <FileIcon type={f.icon} size={40}/>
+                  <span style={{ fontSize:11, textAlign:'center', wordBreak:'break-all', color:'#1a1a1a' }}>{f.name}</span>
+                  {isTrash && (
+                    <button onClick={() => onRestore(f.id)}
+                      style={{ fontSize:10, background:'#0078d4', color:'white', border:'none', borderRadius:3, padding:'2px 6px', cursor:'pointer', marginTop:2 }}>
+                      Восстановить
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </Win10Window>
+  )
+}
+
+/* ──────────────────────────────────────────
+   TOAST NOTIFICATION
+────────────────────────────────────────── */
+function Toast({ msg, type }) {
+  return (
+    <motion.div initial={{ x: 60, opacity:0 }} animate={{ x:0, opacity:1 }} exit={{ x:60, opacity:0 }}
+      style={{
+        position:'fixed', bottom:64, right:16, zIndex:60,
+        background: type==='success' ? '#107c10' : '#1a1a1a',
+        color:'white', borderRadius:4, padding:'12px 16px',
+        maxWidth:300, boxShadow:'0 4px 20px rgba(0,0,0,0.4)',
+        fontFamily:'Segoe UI,sans-serif', fontSize:13, display:'flex', gap:8,
+      }}>
+      <span>{type==='success' ? '✅' : 'ℹ️'}</span>
+      <span>{msg}</span>
+    </motion.div>
+  )
+}
+
+/* ══════════════════════════════════════════
+   MAIN SIMULATOR COMPONENT
+══════════════════════════════════════════ */
 export default function PracticeSimulator({ name, onFinish }) {
-  const [files, setFiles]             = useState(INIT_FILES)
-  const [folders]                     = useState(INIT_FOLDERS)
+  const [files,         setFiles]         = useState(INIT_FILES)
+  const [folders]                          = useState(INIT_FOLDERS)
   const [customFolders, setCustomFolders] = useState([])
-  const [trash, setTrash]             = useState([])
-  const [selected, setSelected]       = useState(null)
-  const [clipboard, setClipboard]     = useState(null)
-  const [openWindow, setOpenWindow]   = useState(null) // {type:'folder'|'trash', id?}
-  const [ctxMenu, setCtxMenu]         = useState(null) // {x,y,target:'desktop'|fileId}
-  const [taskIdx, setTaskIdx]         = useState(0)
-  const [completedTasks, setCompletedTasks] = useState([])
-  const [hintIdx, setHintIdx]         = useState(0)
-  const [totalHints, setTotalHints]   = useState(0)
-  const [totalScore, setTotalScore]   = useState(0)
-  const [dragItem, setDragItem]       = useState(null)
-  const [dropTarget, setDropTarget]   = useState(null)
-  const [toast, setToast]             = useState(null)
-  const [showNewFolder, setShowNewFolder] = useState(false)
+  const [trash,         setTrash]         = useState([])
+  const [selected,      setSelected]      = useState(null)
+  const [clipboard,     setClipboard]     = useState(null)
+  const [dragItem,      setDragItem]      = useState(null)
+  const [dropTarget,    setDropTarget]    = useState(null)
+  const [ctxMenu,       setCtxMenu]       = useState(null)
+  const [openWindow,    setOpenWindow]    = useState(null)
+  const [startMenu,     setStartMenu]     = useState(false)
+  const [toast,         setToast]         = useState(null)
+  const [taskIdx,       setTaskIdx]       = useState(0)
+  const [completedTasks,setCompletedTasks]= useState([])
+  const [hintIdx,       setHintIdx]       = useState(0)
+  const [totalHints,    setTotalHints]    = useState(0)
+  const [score,         setScore]         = useState(0)
+  const [newFolderModal,setNewFolderModal]= useState(false)
   const [newFolderName, setNewFolderName] = useState('')
-  const desktopRef = useRef(null)
+  const [clock,         setClock]         = useState('')
 
-  const currentTask = TASKS[taskIdx]
-  const done = taskIdx >= TASKS.length
-
-  /* ── dispatch action → check task ── */
-  const dispatch = useCallback((action) => {
-    if (done) return
-    const task = TASKS[taskIdx]
-    if (task && task.check(action)) {
-      setCompletedTasks(p => [...p, task.id])
-      setTotalScore(p => p + task.points)
-      showToast(`✅ ${task.text} — Готово! +${task.points} очков`, 'success')
-      setTaskIdx(p => p + 1)
-      setHintIdx(0)
-    }
-  }, [taskIdx, done])
-
-  /* ── keyboard shortcuts ── */
+  // Clock
   useEffect(() => {
-    const handler = (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === 's') { e.preventDefault(); dispatch({ type:'save' }); showToast('💾 Прогресс сохранён!') }
-        if (e.key === 'c' && selected) { e.preventDefault(); setClipboard({ fileId: selected }); dispatch({ type:'copy', fileId: selected }); showToast('📋 Скопировано!') }
-        if (e.key === 'v' && clipboard) { e.preventDefault(); showToast('📌 Вставлено!') }
-        if (e.key === 'z') { e.preventDefault(); showToast('↩️ Действие отменено') }
-        if (e.key === 'a') { e.preventDefault(); showToast('✳️ Всё выделено') }
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [selected, clipboard, dispatch])
+    const tick = () => setClock(new Date().toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit' }))
+    tick(); const t = setInterval(tick, 10000); return () => clearInterval(t)
+  }, [])
 
-  /* ── close context menu on click ── */
+  // Keyboard shortcuts
   useEffect(() => {
-    const close = () => setCtxMenu(null)
-    window.addEventListener('click', close)
-    return () => window.removeEventListener('click', close)
+    const h = (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return
+      if (e.key === 's') { e.preventDefault(); dispatch({ type:'save' }) }
+      if (e.key === 'c' && selected) { e.preventDefault(); setClipboard({ fileId: selected }); dispatch({ type:'copy', fileId: selected }); showToast('Скопировано в буфер обмена') }
+      if (e.key === 'v' && clipboard) { e.preventDefault(); showToast('Вставлено из буфера') }
+      if (e.key === 'z') { e.preventDefault(); showToast('Действие отменено') }
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [selected, clipboard])
+
+  // Close menus on click outside
+  useEffect(() => {
+    const h = () => { setCtxMenu(null); setStartMenu(false) }
+    window.addEventListener('click', h)
+    return () => window.removeEventListener('click', h)
   }, [])
 
   const showToast = (msg, type = 'info') => {
-    setToast({ msg, type })
-    setTimeout(() => setToast(null), 2500)
+    setToast({ msg, type }); setTimeout(() => setToast(null), 2500)
   }
 
-  /* ── drag and drop ── */
-  const onDragStart = (e, fileId) => {
-    e.dataTransfer.setData('text/plain', fileId)
-    setDragItem(fileId)
-  }
-  const onDragEnd = () => { setDragItem(null); setDropTarget(null) }
+  const dispatch = useCallback((action) => {
+    const task = TASKS[taskIdx]
+    if (!task || completedTasks.includes(task.id)) return
+    if (task.check(action)) {
+      setCompletedTasks(p => [...p, task.id])
+      setScore(p => p + task.points)
+      showToast(`✅ Задание выполнено! +${task.points} очков`, 'success')
+      setTaskIdx(p => p + 1)
+      setHintIdx(0)
+    }
+  }, [taskIdx, completedTasks])
 
-  const onDropToFolder = (e, folderId) => {
-    e.preventDefault()
-    const fileId = e.dataTransfer.getData('text/plain')
-    setDropTarget(null); setDragItem(null)
-    if (!fileId) return
-    setFiles(prev => prev.map(f => f.id === fileId ? { ...f, loc: folderId } : f))
+  // DnD
+  const onDragStart = (e, fileId) => { e.dataTransfer.setData('text', fileId); setDragItem(fileId) }
+  const onDragEnd   = () => { setDragItem(null); setDropTarget(null) }
+
+  const dropToFolder = (e, folderId) => {
+    e.preventDefault(); setDropTarget(null)
+    const fileId = e.dataTransfer.getData('text'); if (!fileId) return
+    setFiles(p => p.map(f => f.id === fileId ? { ...f, loc: folderId } : f))
     dispatch({ type:'drop-folder', fileId, folderId })
-    showToast(`📁 Файл перемещён в папку!`)
+    showToast('Файл перемещён в папку')
   }
 
-  const onDropToTrash = (e) => {
-    e.preventDefault()
-    const fileId = e.dataTransfer.getData('text/plain')
-    setDropTarget(null); setDragItem(null)
-    if (!fileId) return
-    const file = files.find(f => f.id === fileId)
-    if (!file) return
-    setFiles(prev => prev.filter(f => f.id !== fileId))
-    setTrash(prev => [...prev, file])
+  const dropToTrash = (e) => {
+    e.preventDefault(); setDropTarget(null)
+    const fileId = e.dataTransfer.getData('text'); if (!fileId) return
+    const file = files.find(f => f.id === fileId); if (!file) return
+    setFiles(p => p.filter(f => f.id !== fileId))
+    setTrash(p => [...p, file])
     dispatch({ type:'drop-trash', fileId })
-    showToast('🗑️ Файл удалён в корзину')
+    showToast('Файл перемещён в Корзину')
   }
 
   const restoreFile = (fileId) => {
-    const file = trash.find(f => f.id === fileId)
-    if (!file) return
-    setTrash(prev => prev.filter(f => f.id !== fileId))
-    setFiles(prev => [...prev, { ...file, loc:'desktop' }])
+    const file = trash.find(f => f.id === fileId); if (!file) return
+    setTrash(p => p.filter(f => f.id !== fileId))
+    setFiles(p => [...p, { ...file, loc:'desktop' }])
     dispatch({ type:'restore', fileId })
   }
 
-  const clickFolder = (id) => {
-    dispatch({ type:'click-folder', id })
-  }
-
-  const openFolder = (id) => {
-    dispatch({ type:'open-folder', id })
-    setOpenWindow({ type:'folder', id })
-  }
-
-  const openTrash = () => {
-    setOpenWindow({ type:'trash' })
-  }
-
-  const handleRightClick = (e, target = 'desktop') => {
-    e.preventDefault()
-    setCtxMenu({ x: e.clientX, y: e.clientY, target })
-  }
-
-  const handleCreateFolder = (e) => {
-    e.stopPropagation()
-    setCtxMenu(null)
-    setNewFolderName('')
-    setShowNewFolder(true)
-  }
-
-  const confirmNewFolder = () => {
-    const n = newFolderName.trim() || 'Новая папка'
-    setCustomFolders(prev => [...prev, { id: `cf-${Date.now()}`, name: n, icon:'📁' }])
-    setShowNewFolder(false)
-    dispatch({ type:'create-folder', name: n })
-  }
-
-  const useHint = () => {
-    if (!currentTask) return
-    const next = Math.min(hintIdx + 1, currentTask.hints.length)
-    setHintIdx(next)
-    setTotalHints(p => p + 1)
-  }
-
-  /* ── derive display items ── */
-  const desktopFiles    = files.filter(f => f.loc === 'desktop')
-  const allFolders      = [...folders, ...customFolders]
-
-  const getFolderFiles  = (fid) => files.filter(f => f.loc === fid)
-
-  const openedFolder    = openWindow?.type === 'folder'
-    ? allFolders.find(f => f.id === openWindow.id)
-    : null
+  const allFolders  = [...folders, ...customFolders]
+  const desktopFiles = files.filter(f => f.loc === 'desktop')
+  const currentTask  = TASKS[taskIdx]
+  const done         = taskIdx >= TASKS.length
 
   return (
-    <div className="min-h-screen pt-16 pb-4 flex flex-col">
-      <div className="flex-1 flex gap-3 px-3 max-w-7xl mx-auto w-full">
+    <div className="fixed inset-0 pt-14" style={{ fontFamily:'Segoe UI,system-ui,sans-serif' }}>
+      {/* ── Desktop area ── */}
+      <div className="absolute inset-0 top-14 bottom-12 overflow-hidden"
+        onContextMenu={e => { e.preventDefault(); setCtxMenu({ x:e.clientX, y:e.clientY, target:'desktop' }) }}
+        onClick={() => { setSelected(null); setCtxMenu(null); setStartMenu(false) }}>
 
-        {/* ── Desktop ── */}
-        <div className="flex-1 flex flex-col gap-3">
-          {/* Desktop area */}
-          <div
-            ref={desktopRef}
-            className="flex-1 relative bg-[#1e3a5f] rounded-2xl overflow-hidden border border-white/10 min-h-[420px]"
-            onContextMenu={(e) => handleRightClick(e, 'desktop')}
-            onClick={() => { setSelected(null); setCtxMenu(null) }}
-          >
-            {/* Desktop label */}
-            <div className="absolute top-2 left-3 text-xs text-white/30 font-bold select-none">Рабочий стол</div>
+        {/* Wallpaper */}
+        <Win10Wallpaper />
 
-            {/* Files grid */}
-            <div className="pt-8 pb-16 px-4 flex flex-wrap gap-2 content-start">
-              {desktopFiles.map(file => (
-                <FileIcon key={file.id} file={file}
-                  selected={selected === file.id}
-                  dragging={dragItem === file.id}
-                  onSelect={(id) => { setSelected(id); }}
-                  onDragStart={onDragStart}
-                  onDragEnd={onDragEnd}
-                  onContextMenu={(e) => { e.stopPropagation(); handleRightClick(e, file.id) }}
-                />
-              ))}
-              {customFolders.map(f => (
-                <FolderIcon key={f.id} folder={f} isOver={dropTarget === f.id}
-                  onSingleClick={() => clickFolder(f.id)}
-                  onDoubleClick={() => openFolder(f.id)}
-                  onDragOver={(e) => { e.preventDefault(); setDropTarget(f.id) }}
-                  onDragLeave={() => setDropTarget(null)}
-                  onDrop={(e) => onDropToFolder(e, f.id)}
-                />
-              ))}
-            </div>
-
-            {/* Folders row */}
-            <div className="absolute bottom-10 left-0 right-0 flex gap-3 px-4">
-              {folders.map(f => (
-                <FolderIcon key={f.id} folder={f} isOver={dropTarget === f.id}
-                  fileCount={getFolderFiles(f.id).length}
-                  onSingleClick={() => clickFolder(f.id)}
-                  onDoubleClick={() => openFolder(f.id)}
-                  onDragOver={(e) => { e.preventDefault(); setDropTarget(f.id) }}
-                  onDragLeave={() => setDropTarget(null)}
-                  onDrop={(e) => onDropToFolder(e, f.id)}
-                />
-              ))}
-            </div>
-
-            {/* Taskbar */}
-            <div className="absolute bottom-0 left-0 right-0 h-10 bg-black/50 backdrop-blur flex items-center px-3 gap-3">
-              <span className="text-xs text-white/60 font-bold">⊞ Пуск</span>
-              <div className="flex-1" />
-              <button
-                className={`flex flex-col items-center cursor-pointer transition-all ${dropTarget==='trash' ? 'scale-125' : ''}`}
-                onClick={openTrash}
-                onDragOver={(e) => { e.preventDefault(); setDropTarget('trash') }}
-                onDragLeave={() => setDropTarget(null)}
-                onDrop={onDropToTrash}
-              >
-                <span className={`text-xl leading-none ${dropTarget==='trash' ? 'text-red-400' : trash.length ? 'opacity-80' : ''}`}>
-                  {trash.length ? '🗑️' : '🗑️'}
-                </span>
-                <span className="text-[9px] text-white/50 font-bold">Корзина{trash.length ? ` (${trash.length})` : ''}</span>
-              </button>
-              <span className="text-xs text-white/40 font-mono">
-                {new Date().toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'})}
-              </span>
-            </div>
-          </div>
-
-          {/* Folder / Trash window */}
-          <AnimatePresence>
-            {openWindow && (
-              <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:10}}
-                className="bg-[#1a1a2e] border border-white/10 rounded-2xl overflow-hidden">
-                {/* Window titlebar */}
-                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border-b border-white/10">
-                  <div className="flex gap-1.5">
-                    <button onClick={() => setOpenWindow(null)}
-                      className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                  </div>
-                  <span className="text-xs font-bold text-gray-300 ml-2">
-                    {openWindow.type === 'trash' ? '🗑️ Корзина' : `📁 ${openedFolder?.name}`}
-                  </span>
-                </div>
-                {/* Window content */}
-                <div className="p-4 min-h-[100px]">
-                  {openWindow.type === 'trash' ? (
-                    trash.length === 0 ? (
-                      <p className="text-gray-500 text-sm font-semibold">Корзина пуста</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {trash.map(f => (
-                          <div key={f.id} className="flex flex-col items-center gap-1 bg-white/5 rounded-xl p-2">
-                            <span className="text-2xl">{f.icon}</span>
-                            <span className="text-xs text-gray-400 font-semibold">{f.name}</span>
-                            <button className="text-[10px] bg-[#A3E635] text-black font-black rounded-lg px-2 py-0.5 mt-1"
-                              onClick={() => restoreFile(f.id)}>
-                              Восстановить
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {getFolderFiles(openWindow.id).length === 0 ? (
-                        <p className="text-gray-500 text-sm font-semibold">Папка пуста</p>
-                      ) : (
-                        getFolderFiles(openWindow.id).map(f => (
-                          <div key={f.id} className="flex flex-col items-center gap-1 bg-white/5 rounded-xl p-2">
-                            <span className="text-2xl">{f.icon}</span>
-                            <span className="text-xs text-gray-400 font-semibold">{f.name}</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* ── Desktop icons: folders (top-left column) ── */}
+        <div className="absolute left-4 top-4 flex flex-col gap-1 z-10">
+          {/* This PC */}
+          <DesktopIcon label="Этот компьютер" type="pc"
+            onClick={e => { e.stopPropagation(); dispatch({ type:'click-folder', id:'pc' }) }}
+            onDblClick={() => showToast('Этот компьютер — здесь все диски')} />
+          {/* Recycle Bin */}
+          <DesktopIcon
+            label="Корзина"
+            type={trash.length ? 'trash-full' : 'trash-empty'}
+            dropHighlight={dropTarget === 'trash'}
+            onDblClick={() => setOpenWindow({ type:'trash' })}
+            onClick={e => e.stopPropagation()}
+            onDragOver={e => { e.preventDefault(); setDropTarget('trash') }}
+            onDragLeave={() => setDropTarget(null)}
+            onDrop={dropToTrash}
+          />
+          {/* System folders */}
+          {allFolders.map(f => (
+            <DesktopIcon key={f.id} label={f.name} type="folder"
+              badgeCount={files.filter(x => x.loc === f.id).length}
+              dropHighlight={dropTarget === f.id}
+              selected={selected === f.id}
+              onClick={e => { e.stopPropagation(); setSelected(f.id); dispatch({ type:'click-folder', id:f.id }) }}
+              onDblClick={() => { setOpenWindow({ type:'folder', id:f.id }); dispatch({ type:'open-folder', id:f.id }) }}
+              onDragOver={e => { e.preventDefault(); setDropTarget(f.id) }}
+              onDragLeave={() => setDropTarget(null)}
+              onDrop={e => dropToFolder(e, f.id)}
+            />
+          ))}
         </div>
 
-        {/* ── Task Panel ── */}
-        <div className="w-64 flex flex-col gap-3">
+        {/* ── Desktop files (second column) ── */}
+        <div className="absolute left-24 top-4 flex flex-col gap-1 z-10">
+          {desktopFiles.map(file => (
+            <DesktopIcon key={file.id} label={file.name} type={file.icon}
+              draggable selected={selected === file.id}
+              isDragging={dragItem === file.id}
+              onClick={e => { e.stopPropagation(); setSelected(file.id) }}
+              onDblClick={() => {
+                if (file.ext === 'txt' || file.ext === 'docx') setOpenWindow({ type:'text', file })
+                else showToast(`Открываю ${file.name}...`)
+              }}
+              onDragStart={e => onDragStart(e, file.id)}
+              onDragEnd={onDragEnd}
+              onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setCtxMenu({ x:e.clientX, y:e.clientY, target:file.id }) }}
+            />
+          ))}
+        </div>
+
+        {/* ── Character mascot (bottom-right) ── */}
+        <img src={`${BASE}assets/character.png`} alt="helper"
+          className="absolute bottom-2 right-4 z-10 pointer-events-none select-none"
+          style={{ height:160, objectFit:'contain', filter:'drop-shadow(0 4px 12px rgba(0,0,0,0.2))' }} />
+
+        {/* ── Open windows ── */}
+        <AnimatePresence>
+          {openWindow?.type === 'folder' && (
+            <FileExplorer key="folder-win"
+              folder={allFolders.find(f => f.id === openWindow.id)}
+              files={files} allFolders={allFolders}
+              onClose={() => setOpenWindow(null)} />
+          )}
+          {openWindow?.type === 'trash' && (
+            <FileExplorer key="trash-win" isTrash files={trash}
+              onClose={() => setOpenWindow(null)} onRestore={restoreFile} />
+          )}
+          {openWindow?.type === 'text' && (
+            <TextEditorWindow key="text-win" file={openWindow.file}
+              name={name} onClose={() => setOpenWindow(null)} />
+          )}
+        </AnimatePresence>
+
+        {/* ── Context menu ── */}
+        <Win10CtxMenu menu={ctxMenu}
+          onCreateFolder={() => { setNewFolderModal(true); setNewFolderName('') }}
+          onPaste={() => clipboard && showToast('Вставлено')}
+          onRefresh={() => showToast('Обновлено')}
+          onClose={() => setCtxMenu(null)}/>
+
+        {/* ── Start menu ── */}
+        <AnimatePresence>
+          {startMenu && <Win10StartMenu key="start" onClose={() => setStartMenu(false)} />}
+        </AnimatePresence>
+      </div>
+
+      {/* ── Task panel ── */}
+      <div className="absolute right-3 top-16 z-20 w-60">
+        <div className="rounded-xl overflow-hidden shadow-2xl"
+          style={{ background:'rgba(15,10,30,0.82)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.12)' }}>
+          {/* Header */}
+          <div className="flex items-center justify-between px-3 py-2"
+            style={{ borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
+            <span className="text-xs font-black text-white/50 uppercase tracking-widest">Задания</span>
+            <span className="text-xs font-black text-[#A3E635]">{taskIdx}/{TASKS.length}</span>
+          </div>
+
           {/* Current task */}
-          <div className="card p-4">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Задание</span>
-              <span className="text-xs font-black text-[#A3E635]">{taskIdx}/{TASKS.length}</span>
-            </div>
+          <div className="px-3 py-3">
             {done ? (
-              <div className="text-center py-4">
-                <div className="text-4xl mb-2">🏆</div>
-                <div className="font-black text-[#A3E635]">Все задания выполнены!</div>
-                <div className="text-sm text-gray-400 mt-1">Очки: {totalScore}/130</div>
+              <div className="text-center py-2">
+                <div className="text-3xl mb-1">🏆</div>
+                <div className="font-black text-[#A3E635] text-sm">Все выполнены!</div>
+                <div className="text-xs text-white/50 mt-0.5">Очки: {score}/130</div>
               </div>
             ) : (
               <>
-                <div className="bg-purple-500/15 border border-purple-500/30 rounded-xl p-3 mb-3">
-                  <p className="text-sm font-bold text-white leading-snug">{currentTask?.text}</p>
-                  <div className="text-xs text-purple-300 mt-1 font-semibold">+{currentTask?.points} очков</div>
+                <div className="bg-purple-500/20 border border-purple-500/30 rounded-lg p-2.5 mb-2">
+                  <p className="text-xs font-bold text-white leading-snug">{currentTask?.text}</p>
+                  <div className="text-[10px] text-purple-300 mt-1">+{currentTask?.points} очков</div>
                 </div>
-
-                {/* Hints */}
-                {hintIdx > 0 && (
-                  <div className="space-y-1 mb-3">
-                    {currentTask?.hints.slice(0, hintIdx).map((h, i) => (
-                      <div key={i} className="text-xs text-yellow-300 font-semibold bg-yellow-500/10 rounded-lg px-2 py-1.5">
-                        💡 {h}
-                      </div>
-                    ))}
+                {hintIdx > 0 && currentTask?.hints.slice(0, hintIdx).map((h, i) => (
+                  <div key={i} className="text-[10px] text-yellow-300 bg-yellow-500/10 rounded-lg px-2 py-1.5 mb-1 leading-snug">
+                    💡 {h}
                   </div>
-                )}
-
+                ))}
                 {hintIdx < (currentTask?.hints.length || 0) && (
-                  <button className="btn-outline w-full text-sm py-2" onClick={useHint}>
+                  <button className="w-full text-[11px] border border-white/20 rounded-lg py-1.5 text-white/60 hover:text-white hover:border-white/40 transition-colors"
+                    onClick={() => { setHintIdx(p => p+1); setTotalHints(p => p+1) }}>
                     💡 Подсказка ({hintIdx}/{currentTask?.hints.length})
                   </button>
                 )}
@@ -412,155 +544,275 @@ export default function PracticeSimulator({ name, onFinish }) {
             )}
           </div>
 
-          {/* Progress */}
-          <div className="card p-4">
-            <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Прогресс</div>
-            <div className="space-y-1">
-              {TASKS.map((t, i) => (
-                <div key={t.id} className={`flex items-center gap-2 text-xs font-semibold rounded-lg px-2 py-1
-                  ${completedTasks.includes(t.id) ? 'text-[#A3E635] bg-[#A3E635]/10' :
-                    i === taskIdx ? 'text-purple-300 bg-purple-500/15' : 'text-gray-600'}`}>
-                  {completedTasks.includes(t.id) ? '✓' : i === taskIdx ? '▶' : '○'}
-                  <span className="truncate">{t.text.slice(0, 28)}…</span>
-                </div>
-              ))}
-            </div>
+          {/* Progress dots */}
+          <div className="flex gap-1 px-3 pb-2 flex-wrap">
+            {TASKS.map((t, i) => (
+              <div key={t.id} className={`h-1.5 rounded-full transition-all ${
+                completedTasks.includes(t.id) ? 'bg-[#A3E635] w-4' :
+                i === taskIdx ? 'bg-purple-400 w-4' : 'bg-white/20 w-2'}`}/>
+            ))}
           </div>
 
           {/* Score */}
-          <div className="card p-3 text-center">
-            <div className="text-2xl font-black text-[#A3E635]">{totalScore}</div>
-            <div className="text-xs text-gray-400 font-bold">/ 130 очков</div>
+          <div className="px-3 pb-3 flex items-center justify-between">
+            <span className="text-[11px] text-white/40 font-semibold">Очков:</span>
+            <span className="text-base font-black text-[#A3E635]">{score}</span>
           </div>
+        </div>
 
-          {/* Finish button */}
-          {(done || taskIdx >= 5) && (
-            <button className="btn-green" onClick={() => onFinish({ score: totalScore, hints: totalHints })}>
-              К тесту →
+        {/* Finish button */}
+        {(done || taskIdx >= 5) && (
+          <button className="btn-green w-full mt-2 text-sm py-2"
+            onClick={() => onFinish({ score, hints: totalHints })}>
+            К тесту →
+          </button>
+        )}
+      </div>
+
+      {/* ── Taskbar ── */}
+      <div className="absolute bottom-0 left-0 right-0 h-12 z-20 flex items-center"
+        style={{ background:'rgba(0,0,0,0.88)', backdropFilter:'blur(20px)', borderTop:'1px solid rgba(255,255,255,0.08)' }}>
+        {/* Start button */}
+        <button className="w-12 h-12 flex items-center justify-center hover:bg-white/10 transition-colors"
+          onClick={e => { e.stopPropagation(); setStartMenu(s => !s) }}>
+          <WinLogo size={20}/>
+        </button>
+        {/* Search */}
+        <div className="flex items-center gap-1.5 bg-white/10 rounded-sm h-8 px-3 mr-1 cursor-text"
+          style={{ minWidth:200, border:'1px solid rgba(255,255,255,0.1)' }}>
+          <span className="text-white/50 text-sm">🔍</span>
+          <span className="text-white/50 text-xs">Поиск</span>
+        </div>
+        {/* Task view */}
+        <button className="w-10 h-12 flex items-center justify-center hover:bg-white/10 transition-colors text-white/70 text-sm">
+          ⊡
+        </button>
+        {/* Pinned apps */}
+        <div className="flex items-center gap-0.5 ml-1">
+          {[['📁','Проводник'],['🌐','Edge'],['🛒','Магазин'],['⚙️','Параметры']].map(([ic, label]) => (
+            <button key={label} title={label}
+              className="w-10 h-12 flex items-center justify-center hover:bg-white/10 transition-colors text-xl"
+              onClick={e => { e.stopPropagation(); showToast(`Открываю ${label}...`) }}>
+              {ic}
             </button>
-          )}
+          ))}
+        </div>
+        {/* citrend logo in taskbar */}
+        <div className="ml-1 flex items-center gap-1.5 border-l border-white/10 pl-2">
+          <img src={`${BASE}assets/logo.png`} alt="citrend" style={{ height:22, objectFit:'contain', opacity:0.7 }}/>
+        </div>
+        {/* Running app indicator */}
+        {openWindow && (
+          <button className="flex items-center gap-1.5 h-12 px-3 hover:bg-white/10 transition-colors border-b-2 border-[#8b5cf6]"
+            onClick={e => { e.stopPropagation() }}>
+            <span className="text-sm">{openWindow.type === 'trash' ? '🗑️' : '📁'}</span>
+            <span className="text-xs text-white/80 font-semibold">
+              {openWindow.type === 'trash' ? 'Корзина' : openWindow.type === 'text' ? openWindow.file?.name : allFolders.find(f=>f.id===openWindow.id)?.name}
+            </span>
+          </button>
+        )}
+
+        {/* System tray */}
+        <div className="ml-auto flex items-center gap-1 pr-1">
+          <div className="flex items-center gap-1 px-2 h-10 hover:bg-white/10 rounded cursor-pointer">
+            <span className="text-white/70 text-sm">📶</span>
+            <span className="text-white/70 text-sm">🔊</span>
+          </div>
+          <div className="flex flex-col items-end justify-center px-3 h-12 hover:bg-white/10 cursor-pointer min-w-[72px]">
+            <span className="text-white text-xs font-semibold leading-none">{clock}</span>
+            <span className="text-white/50 text-[10px] leading-none mt-0.5">
+              {new Date().toLocaleDateString('ru', { day:'2-digit', month:'2-digit', year:'numeric' })}
+            </span>
+          </div>
+          <button className="w-2 h-10 hover:bg-white/10 rounded"/>
         </div>
       </div>
 
-      {/* ── Context Menu ── */}
-      {ctxMenu && (
-        <div
-          style={{ left: ctxMenu.x, top: ctxMenu.y }}
-          className="fixed z-50 bg-gray-900 border border-gray-600 rounded-xl shadow-2xl py-1 min-w-[180px]"
-          onClick={e => e.stopPropagation()}
-        >
-          <button className="w-full text-left px-4 py-2 text-sm font-bold text-white hover:bg-purple-500/30 transition-colors flex items-center gap-2"
-            onClick={handleCreateFolder}>
-            📁 Создать папку
-          </button>
-          <div className="px-4 py-2 text-sm text-gray-500 font-semibold flex items-center gap-2 cursor-default">
-            📄 Создать документ
-          </div>
-          <div className="border-t border-white/10 mx-2 my-1" />
-          {clipboard && (
-            <div className="px-4 py-2 text-sm text-gray-400 font-semibold flex items-center gap-2 cursor-default">
-              📋 Вставить
-            </div>
-          )}
-          <div className="px-4 py-2 text-sm text-gray-500 font-semibold flex items-center gap-2 cursor-default">
-            🔄 Обновить
-          </div>
-        </div>
-      )}
-
       {/* ── New folder modal ── */}
-      {showNewFolder && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="card p-5 w-full max-w-xs pop">
-            <h3 className="font-black text-white mb-3">Введи имя папки</h3>
-            <input
-              autoFocus
-              value={newFolderName}
-              onChange={e => setNewFolderName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && confirmNewFolder()}
-              placeholder="Новая папка"
-              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white font-bold outline-none focus:border-purple-400 mb-3"
-            />
-            <div className="flex gap-2">
-              <button className="btn-green flex-1" onClick={confirmNewFolder}>Создать</button>
-              <button className="btn-outline flex-1" onClick={() => setShowNewFolder(false)}>Отмена</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Toast ── */}
       <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{opacity:0, y:40}} animate={{opacity:1, y:0}} exit={{opacity:0, y:40}}
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl
-              font-bold text-sm shadow-2xl
-              ${toast.type === 'success' ? 'bg-[#A3E635] text-black' : 'bg-gray-800 text-white border border-white/20'}`}
-          >
-            {toast.msg}
+        {newFolderModal && (
+          <motion.div key="modal" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background:'rgba(0,0,0,0.5)' }}>
+            <motion.div initial={{scale:.9,opacity:0}} animate={{scale:1,opacity:1}}
+              style={{ background:'white', borderRadius:4, padding:24, width:320,
+                boxShadow:'0 16px 60px rgba(0,0,0,0.5)', fontFamily:'Segoe UI,sans-serif' }}
+              onClick={e => e.stopPropagation()}>
+              <h3 style={{ fontSize:15, fontWeight:600, marginBottom:12, color:'#1a1a1a' }}>Создать новую папку</h3>
+              <input autoFocus value={newFolderName} onChange={e => setNewFolderName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && confirmFolder()}
+                placeholder="Новая папка"
+                style={{ width:'100%', border:'1px solid #c0c0c0', borderRadius:3, padding:'6px 10px',
+                  fontSize:13, outline:'none', marginBottom:16 }}/>
+              <div style={{ display:'flex', gap:8, justifyContent:'flex-end' }}>
+                <button onClick={() => setNewFolderModal(false)}
+                  style={{ padding:'6px 16px', border:'1px solid #c0c0c0', borderRadius:3, cursor:'pointer', background:'white', fontSize:13 }}>
+                  Отмена
+                </button>
+                <button onClick={confirmFolder}
+                  style={{ padding:'6px 16px', background:'#0078d4', color:'white', border:'none', borderRadius:3, cursor:'pointer', fontSize:13 }}>
+                  Создать
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Toast ── */}
+      <AnimatePresence>
+        {toast && <Toast key="toast" msg={toast.msg} type={toast.type}/>}
+      </AnimatePresence>
     </div>
   )
-}
 
-/* ── File icon component ── */
-function FileIcon({ file, selected, dragging, onSelect, onDragStart, onDragEnd, onContextMenu }) {
-  return (
-    <div
-      draggable
-      onClick={(e) => { e.stopPropagation(); onSelect(file.id) }}
-      onDragStart={(e) => onDragStart(e, file.id)}
-      onDragEnd={onDragEnd}
-      onContextMenu={onContextMenu}
-      className={`flex flex-col items-center gap-1 p-2 rounded-xl cursor-grab active:cursor-grabbing
-        transition-all select-none w-16
-        ${dragging ? 'opacity-40' : ''}
-        ${selected ? 'selected-item' : 'hover:bg-white/10'}`}
-    >
-      <span className="text-3xl">{file.icon}</span>
-      <span className="text-xs font-bold text-center text-gray-300 leading-tight w-full truncate">
-        {file.name}
-      </span>
-    </div>
-  )
-}
-
-/* ── Folder icon component ── */
-function FolderIcon({ folder, isOver, fileCount, onSingleClick, onDoubleClick, onDragOver, onDragLeave, onDrop }) {
-  const [clicks, setClicks]   = useState(0)
-  const timerRef              = useRef(null)
-
-  const handleClick = () => {
-    const next = clicks + 1
-    setClicks(next)
-    clearTimeout(timerRef.current)
-    if (next >= 2) { setClicks(0); onDoubleClick() }
-    else {
-      timerRef.current = setTimeout(() => { setClicks(0); onSingleClick() }, 280)
-    }
+  function confirmFolder() {
+    const n = newFolderName.trim() || 'Новая папка'
+    setCustomFolders(p => [...p, { id:`cf-${Date.now()}`, name:n }])
+    setNewFolderModal(false)
+    dispatch({ type:'create-folder', name: n })
+    showToast(`Папка «${n}» создана`, 'success')
   }
+}
+
+/* ──────────────────────────────────────────
+   Desktop icon component
+────────────────────────────────────────── */
+function DesktopIcon({ label, type, selected, draggable, isDragging, dropHighlight, badgeCount,
+  onClick, onDblClick, onDragStart, onDragEnd, onDragOver, onDragLeave, onDrop, onContextMenu }) {
+  return (
+    <div draggable={!!draggable}
+      onClick={onClick} onDoubleClick={onDblClick}
+      onDragStart={onDragStart} onDragEnd={onDragEnd}
+      onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+      onContextMenu={onContextMenu}
+      className={`flex flex-col items-center gap-0.5 p-1.5 rounded cursor-pointer select-none
+        transition-all w-20 ${isDragging ? 'opacity-40' : ''}`}
+      style={{
+        background: dropHighlight ? 'rgba(0,120,212,0.15)' : selected ? 'rgba(0,120,212,0.2)' : 'transparent',
+        outline: dropHighlight ? '2px dashed #0078d4' : selected ? '2px solid rgba(0,120,212,0.5)' : 'none',
+        borderRadius: 4,
+      }}>
+      <div className="relative">
+        <FileIcon type={type} size={44}/>
+        {badgeCount > 0 && (
+          <div className="absolute -top-1 -right-1 bg-[#8b5cf6] text-white text-[9px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+            {badgeCount}
+          </div>
+        )}
+      </div>
+      <span className="text-center leading-tight text-white font-semibold w-full"
+        style={{ fontSize:11, textShadow:'0 1px 3px rgba(0,0,0,0.7)', wordBreak:'break-word' }}>
+        {label}
+      </span>
+    </div>
+  )
+}
+
+/* ──────────────────────────────────────────
+   Text editor window
+────────────────────────────────────────── */
+function TextEditorWindow({ file, name, onClose }) {
+  const [content, setContent] = useState(`${name}\n`)
+  const [saved, setSaved]     = useState(false)
+
+  useEffect(() => {
+    const h = (e) => {
+      if ((e.ctrlKey||e.metaKey) && e.key === 's') { e.preventDefault(); setSaved(true); setTimeout(()=>setSaved(false),2000) }
+      if ((e.ctrlKey||e.metaKey) && e.key === 'a') { e.preventDefault(); e.target.select?.() }
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [])
 
   return (
-    <div
-      onClick={handleClick}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-      className={`flex flex-col items-center gap-1 p-2 rounded-xl cursor-pointer transition-all select-none w-16
-        ${isOver ? 'drop-highlight scale-110' : 'hover:bg-white/10'}`}
-    >
-      <span className="text-3xl">{folder.icon}</span>
-      <span className="text-xs font-bold text-center text-gray-300 leading-tight truncate w-full">
-        {folder.name}
-      </span>
-      {fileCount > 0 && (
-        <span className="text-[9px] bg-purple-500 text-white rounded-full px-1 font-black -mt-0.5">
-          {fileCount}
-        </span>
-      )}
-    </div>
+    <Win10Window title={file.name} icon="📝" onClose={onClose} onMinimize={onClose} defaultX={200} defaultY={100} width={520} height={380}>
+      <div style={{ height:'100%', display:'flex', flexDirection:'column' }}>
+        {/* Notepad menu bar */}
+        <div style={{ background:'#f9f9f9', borderBottom:'1px solid #e5e5e5', padding:'3px 8px', display:'flex', gap:12, fontSize:12 }}>
+          {['Файл','Правка','Формат','Вид','Справка'].map(m => (
+            <button key={m} style={{ background:'none', border:'none', cursor:'pointer', padding:'2px 4px', fontSize:12, color:'#1a1a1a' }}
+              onMouseOver={e=>e.target.style.background='#e5e5e5'} onMouseOut={e=>e.target.style.background='none'}>
+              {m}
+            </button>
+          ))}
+        </div>
+        <textarea value={content} onChange={e => setContent(e.target.value)}
+          style={{ flex:1, padding:12, fontSize:14, lineHeight:'1.6', border:'none', outline:'none',
+            fontFamily:'Consolas,monospace', resize:'none', background:'white', color:'#1a1a1a' }}
+        />
+        {saved && (
+          <div style={{ background:'#107c10', color:'white', padding:'4px 12px', fontSize:12, textAlign:'center' }}>
+            ✅ Файл сохранён (Ctrl+S)
+          </div>
+        )}
+      </div>
+    </Win10Window>
+  )
+}
+
+/* ──────────────────────────────────────────
+   Windows Start menu
+────────────────────────────────────────── */
+function Win10StartMenu({ onClose }) {
+  const apps = [
+    ['📁','Проводник'],['🌐','Edge'],['⚙️','Параметры'],['🎮','Игры'],
+    ['📊','Excel'],['📝','Word'],['🎵','Медиаплеер'],['🔒','Безопасность'],
+  ]
+  return (
+    <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} exit={{opacity:0,y:20}}
+      onClick={e => e.stopPropagation()}
+      style={{
+        position:'fixed', bottom:50, left:0, width:380, zIndex:40,
+        background:'rgba(32,32,32,0.96)', backdropFilter:'blur(20px)',
+        boxShadow:'0 -4px 40px rgba(0,0,0,0.6)', borderRadius:'0 8px 0 0',
+        fontFamily:'Segoe UI,sans-serif', overflow:'hidden',
+      }}>
+      {/* Search in start */}
+      <div style={{ padding:'16px 16px 8px' }}>
+        <div style={{ background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.2)',
+          borderRadius:4, padding:'8px 12px', display:'flex', alignItems:'center', gap:8 }}>
+          <span style={{ fontSize:16 }}>🔍</span>
+          <span style={{ color:'rgba(255,255,255,0.5)', fontSize:13 }}>Поиск приложений, настроек и файлов</span>
+        </div>
+      </div>
+      {/* Pinned apps */}
+      <div style={{ padding:'8px 16px' }}>
+        <div style={{ color:'rgba(255,255,255,0.5)', fontSize:12, marginBottom:8 }}>Закреплённые</div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:4 }}>
+          {apps.map(([ic, label]) => (
+            <button key={label} onClick={() => { onClose() }}
+              style={{ background:'none', border:'none', cursor:'pointer', padding:'10px 4px',
+                display:'flex', flexDirection:'column', alignItems:'center', gap:4, borderRadius:4,
+                color:'white' }}
+              onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.1)'}
+              onMouseOut={e=>e.currentTarget.style.background='none'}>
+              <span style={{ fontSize:24 }}>{ic}</span>
+              <span style={{ fontSize:11, textAlign:'center', lineHeight:1.2 }}>{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* User row */}
+      <div style={{ borderTop:'1px solid rgba(255,255,255,0.1)', padding:'12px 16px',
+        display:'flex', alignItems:'center', gap:10 }}>
+        <div style={{ width:36, height:36, borderRadius:'50%', background:'linear-gradient(135deg,#8b5cf6,#a78bfa)',
+          display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>👤</div>
+        <div>
+          <div style={{ color:'white', fontSize:13, fontWeight:600 }}>Ученик</div>
+          <div style={{ color:'rgba(255,255,255,0.4)', fontSize:11 }}>Локальная учётная запись</div>
+        </div>
+        <button onClick={onClose} style={{ marginLeft:'auto', background:'none', border:'none', cursor:'pointer', color:'rgba(255,255,255,0.5)', fontSize:18 }}>⏻</button>
+      </div>
+    </motion.div>
+  )
+}
+
+/* Windows logo SVG */
+function WinLogo({ size = 24 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" fill="#ffffff"/>
+    </svg>
   )
 }
