@@ -30,10 +30,14 @@ export default function InteractiveSlides({ name, onFinish }) {
   const markDone = (id, pts = 10) => {
     if (!done.has(id)) { setDone(p => new Set(p).add(id)); setPoints(p => p + pts) }
   }
-  const canNext = done.has(current.id) || ['intro', 'hotkeys-info', 'recap'].includes(current.type)
+  // 'title', 'hotkeys-info', 'recap' are info-only — no task needed to proceed
+  const FREE_TYPES = ['title', 'hotkeys-info', 'recap']
+  const canNext = done.has(current.id) || FREE_TYPES.includes(current.type)
 
   const next = () => isLast ? onFinish() : setIdx(i => i + 1)
   const prev = () => setIdx(i => Math.max(0, i - 1))
+  // Skip: mark done and advance (counts 0 pts)
+  const skip = () => { markDone(current.id, 0); }
 
   return (
     <div className="min-h-screen pt-16 pb-8 px-4 flex flex-col items-center">
@@ -59,12 +63,15 @@ export default function InteractiveSlides({ name, onFinish }) {
       </div>
 
       {/* Nav */}
-      <div className="w-full max-w-2xl flex justify-between items-center mt-6">
+      <div className="w-full max-w-2xl flex justify-between items-center mt-6 gap-3">
         <button className="btn-outline" onClick={prev} disabled={idx === 0}>← Назад</button>
         {!canNext && (
-          <span className="text-sm text-gray-500 font-semibold italic">
-            Выполни задание, чтобы продолжить
-          </span>
+          <button
+            className="text-sm text-gray-500 font-semibold underline underline-offset-2 hover:text-gray-300 transition-colors bg-transparent border-none cursor-pointer"
+            onClick={skip}
+          >
+            Пропустить
+          </button>
         )}
         <button className="btn-green" onClick={next} disabled={!canNext}>
           {isLast ? 'К практике →' : 'Дальше →'}
