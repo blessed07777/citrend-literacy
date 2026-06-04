@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { getBadge, Logo } from '../App'
+import { getBadge, Logo } from '../shared'
 
 export default function ResultScreen({ name, stats, onRestart }) {
   const { totalScore = 0, quizScore = 0, quizTotal = 7, practiceScore = 0,

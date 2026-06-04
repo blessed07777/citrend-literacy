@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Logo } from '../App'
+import { Logo } from '../shared'
 
 export default function WelcomeScreen({ onStart }) {
   const [name, setName] = useState('')
