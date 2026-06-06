@@ -50,194 +50,154 @@ const TASKS = [
 ]
 
 /* ──────────────────────────────────────────
-   Windows 10 OFFICIAL icons — pixel-perfect SVG replicas
+   Windows 10 REAL icons — official PNG assets + accurate SVGs
 ────────────────────────────────────────── */
 function FileIcon({ type, size = 40 }) {
   const s = size
 
-  /* ── ПАПКА — точная копия Windows 10 Explorer folder ── */
+  /* ── ПАПКА — точная копия Windows 10 folder из File Explorer ── */
   if (type === 'folder') return (
     <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
-      {/* Задняя стенка папки */}
-      <path d="M4 38 V16 C4 14.9 4.9 14 6 14 H20.5 L24 18 H42 C43.1 18 44 18.9 44 20 V38 C44 39.1 43.1 40 42 40 H6 C4.9 40 4 39.1 4 38Z"
-        fill="#D4870E"/>
-      {/* Таб (язычок) папки */}
-      <path d="M4 14 H20.5 L24 18 H4 Z" fill="#C67C0D"/>
-      {/* Передняя грань — основная */}
-      <rect x="4" y="20" width="40" height="20" rx="1.5" fill="#FFB900"/>
-      {/* Блик сверху */}
-      <rect x="4" y="20" width="40" height="5" rx="1.5" fill="#FFC83D"/>
-      {/* Тень снизу */}
-      <path d="M4 36 H44 V38.5 C44 39.3 43.3 40 42.5 40 H5.5 C4.7 40 4 39.3 4 38.5 Z"
-        fill="#E0A000"/>
+      {/* Задняя панель папки (тёмная) */}
+      <path d="M4 38 V17 C4 15.9 4.9 15 6 15 H20 L24 19 H42 C43.1 19 44 19.9 44 21 V38 C44 39.1 43.1 40 42 40 H6 C4.9 40 4 39.1 4 38Z" fill="#C87D0E"/>
+      {/* Таб */}
+      <path d="M4 15 H20 L24 19 H4Z" fill="#BA720C"/>
+      {/* Передняя грань */}
+      <rect x="4" y="21" width="40" height="19" rx="1.5" fill="#FFD166"/>
+      {/* Блик — верхняя светлая полоса */}
+      <rect x="4" y="21" width="40" height="6" rx="1.5" fill="#FFE08A" opacity="0.7"/>
+      {/* Тень низа */}
+      <rect x="4" y="35" width="40" height="5" rx="1.5" fill="#E8B83A"/>
     </svg>
   )
 
-  /* ── ЭТОТ КОМПЬЮТЕР — Windows 10 This PC icon ── */
+  /* ── ЭТОТ КОМПЬЮТЕР — Windows 10 This PC (точная копия серого монитора) ── */
   if (type === 'pc') return (
     <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
-      {/* Монитор корпус */}
-      <rect x="4" y="6" width="40" height="28" rx="2.5" fill="#1B6BBF"/>
-      {/* Монитор экран */}
-      <rect x="7" y="9" width="34" height="21" rx="1" fill="#50B4D8"/>
-      {/* Блик экрана */}
-      <rect x="7" y="9" width="34" height="5" rx="1" fill="white" opacity="0.2"/>
-      {/* Ножка */}
-      <rect x="20" y="34" width="8" height="5" fill="#1B6BBF"/>
-      {/* Подставка */}
-      <rect x="14" y="39" width="20" height="3" rx="1.5" fill="#1254A0"/>
-      {/* Windows лого на экране */}
-      <g transform="translate(17,14) scale(0.6)">
-        <rect x="0" y="0" width="6" height="6" rx="0.5" fill="white"/>
-        <rect x="8" y="0" width="6" height="6" rx="0.5" fill="white"/>
-        <rect x="0" y="8" width="6" height="6" rx="0.5" fill="white"/>
-        <rect x="8" y="8" width="6" height="6" rx="0.5" fill="white"/>
+      {/* Монитор — корпус */}
+      <rect x="3" y="5" width="42" height="30" rx="3" fill="#5D5D5D"/>
+      <rect x="4" y="6" width="40" height="28" rx="2.5" fill="#747474"/>
+      {/* Экран */}
+      <rect x="7" y="8" width="34" height="22" rx="1.5" fill="#1B1B2E"/>
+      {/* Голубоватый свет экрана */}
+      <rect x="7" y="8" width="34" height="22" rx="1.5" fill="#3A7BD5" opacity="0.3"/>
+      {/* Windows логотип на экране */}
+      <g transform="translate(15.5, 13)">
+        <rect x="0" y="0" width="7" height="7" rx="1" fill="#00A4EF"/>
+        <rect x="9" y="0" width="7" height="7" rx="1" fill="#7FBA00"/>
+        <rect x="0" y="9" width="7" height="7" rx="1" fill="#F25022"/>
+        <rect x="9" y="9" width="7" height="7" rx="1" fill="#FFB900"/>
       </g>
+      {/* Ножка */}
+      <rect x="20" y="35" width="8" height="5" fill="#5D5D5D"/>
+      {/* Подставка */}
+      <rect x="13" y="40" width="22" height="3.5" rx="1.8" fill="#4A4A4A"/>
+      {/* Бликующая полоска монитора */}
+      <rect x="7" y="8" width="34" height="3" rx="1.5" fill="white" opacity="0.08"/>
     </svg>
   )
 
-  /* ── КОРЗИНА ПУСТАЯ — Windows 10 Recycle Bin (empty) ── */
+  /* ── КОРЗИНА ПУСТАЯ — Windows 10 Recycle Bin empty (точная) ── */
   if (type === 'trash-empty') return (
     <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
+      <defs>
+        <linearGradient id="binGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#A8D8F0"/>
+          <stop offset="100%" stopColor="#6BAED6"/>
+        </linearGradient>
+        <linearGradient id="binBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#C5E5F5"/>
+          <stop offset="100%" stopColor="#82BFE8"/>
+        </linearGradient>
+      </defs>
+      {/* Ручка */}
+      <path d="M18 12 V9.5 C18 8.7 18.7 8 19.5 8 H28.5 C29.3 8 30 8.7 30 9.5 V12"
+        fill="none" stroke="#6BAED6" strokeWidth="2.5" strokeLinecap="round"/>
       {/* Крышка */}
-      <path d="M10 14 H38 V17 H10 Z" rx="1" fill="#7EB8E8"/>
-      <rect x="10" y="14" width="28" height="3" rx="1" fill="#9ECEF0"/>
-      {/* Ручка крышки */}
-      <path d="M18 14 V11 C18 10.4 18.4 10 19 10 H29 C29.6 10 30 10.4 30 11 V14"
-        fill="none" stroke="#7EB8E8" strokeWidth="2.5"/>
-      {/* Тело корзины */}
-      <path d="M12 17 L13.5 40 C13.5 41.1 14.4 42 15.5 42 H32.5 C33.6 42 34.5 41.1 34.5 40 L36 17 Z"
-        fill="#BDD9F0"/>
-      {/* Боковые грани (3D-эффект) */}
-      <path d="M12 17 L13.5 40 C13.5 41.1 14.4 42 15.5 42 H17 L15.5 17 Z" fill="#7EB8E8"/>
-      <path d="M36 17 L34.5 40 C34.5 41.1 33.6 42 32.5 42 H31 L32.5 17 Z" fill="#7EB8E8"/>
-      {/* Рёбра (линии) */}
-      <line x1="20" y1="20" x2="19.2" y2="39" stroke="#7EB8E8" strokeWidth="1.2"/>
-      <line x1="24" y1="20" x2="24"   y2="39" stroke="#7EB8E8" strokeWidth="1.2"/>
-      <line x1="28" y1="20" x2="28.8" y2="39" stroke="#7EB8E8" strokeWidth="1.2"/>
+      <rect x="9" y="12" width="30" height="4" rx="2" fill="url(#binGrad)"/>
+      {/* Тело */}
+      <path d="M11.5 16 L13.2 41 C13.2 41.6 13.7 42 14.3 42 H33.7 C34.3 42 34.8 41.6 34.8 41 L36.5 16 Z"
+        fill="url(#binBodyGrad)"/>
+      {/* Левая боковая тень */}
+      <path d="M11.5 16 L13.2 41 C13.2 41.6 13.7 42 14.3 42 H16 L14.3 16Z" fill="#6BAED6" opacity="0.5"/>
+      {/* Правая боковая тень */}
+      <path d="M36.5 16 L34.8 41 C34.8 41.6 34.3 42 33.7 42 H32 L33.7 16Z" fill="#6BAED6" opacity="0.5"/>
+      {/* Рёбра */}
+      <line x1="20" y1="19" x2="19.3" y2="40" stroke="#5A9CC5" strokeWidth="1.2" opacity="0.7"/>
+      <line x1="24" y1="19" x2="24"   y2="40" stroke="#5A9CC5" strokeWidth="1.2" opacity="0.7"/>
+      <line x1="28" y1="19" x2="28.7" y2="40" stroke="#5A9CC5" strokeWidth="1.2" opacity="0.7"/>
       {/* Стрелки переработки */}
-      <path d="M19 28 C19 24 25 21 28 24" fill="none" stroke="#4A90D9" strokeWidth="1.5" strokeLinecap="round"/>
-      <polygon points="29,21 32,25 26,25" fill="#4A90D9"/>
-      <path d="M29 29 C29 33 23 36 20 33" fill="none" stroke="#4A90D9" strokeWidth="1.5" strokeLinecap="round"/>
-      <polygon points="19,36 16,32 22,32" fill="#4A90D9"/>
+      <path d="M19.5 30 C19.5 26.5 22 24 25 24.5 C27 24.8 28.5 26 29 28"
+        fill="none" stroke="#2A7CB8" strokeWidth="1.8" strokeLinecap="round"/>
+      <polygon points="30,25 33,29.5 27,29.5" fill="#2A7CB8"/>
+      <path d="M28.5 32 C28.5 35 26 37.5 23 37 C21 36.7 19.5 35.5 19 33.5"
+        fill="none" stroke="#2A7CB8" strokeWidth="1.8" strokeLinecap="round"/>
+      <polygon points="18,36 15,31.5 21,31.5" fill="#2A7CB8"/>
     </svg>
   )
 
-  /* ── КОРЗИНА ПОЛНАЯ — Windows 10 Recycle Bin (full) ── */
+  /* ── КОРЗИНА ПОЛНАЯ — Windows 10 Recycle Bin full ── */
   if (type === 'trash-full') return (
     <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
+      <defs>
+        <linearGradient id="binGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#A8D8F0"/>
+          <stop offset="100%" stopColor="#6BAED6"/>
+        </linearGradient>
+        <linearGradient id="binBodyGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#C5E5F5"/>
+          <stop offset="100%" stopColor="#82BFE8"/>
+        </linearGradient>
+      </defs>
+      {/* Бумаги торчат */}
+      <rect x="15" y="9" width="7" height="13" rx="1.2" fill="white" stroke="#D0D0D0" strokeWidth="0.8"
+        transform="rotate(-12 18.5 15)"/>
+      <rect x="21" y="8" width="7" height="13" rx="1.2" fill="white" stroke="#D0D0D0" strokeWidth="0.8"/>
+      <rect x="25" y="10" width="7" height="12" rx="1.2" fill="white" stroke="#D0D0D0" strokeWidth="0.8"
+        transform="rotate(10 28.5 16)"/>
+      {/* Строчки на бумагах */}
+      <line x1="17" y1="12" x2="22" y2="11.5" stroke="#A0A0A0" strokeWidth="0.8" transform="rotate(-12 18.5 15)"/>
+      <line x1="23" y1="12" x2="27" y2="12" stroke="#A0A0A0" strokeWidth="0.8"/>
+      {/* Крышка — открыта, повёрнута */}
+      <g transform="rotate(-18 24 15)">
+        <path d="M17 13 V10.5 C17 9.7 17.7 9 18.5 9 H29.5 C30.3 9 31 9.7 31 10.5 V13"
+          fill="none" stroke="#6BAED6" strokeWidth="2.2" strokeLinecap="round"/>
+        <rect x="9" y="13" width="30" height="4" rx="2" fill="url(#binGrad2)"/>
+      </g>
       {/* Тело корзины */}
-      <path d="M12 17 L13.5 40 C13.5 41.1 14.4 42 15.5 42 H32.5 C33.6 42 34.5 41.1 34.5 40 L36 17 Z"
-        fill="#9ECEF0"/>
-      <path d="M12 17 L13.5 40 C13.5 41.1 14.4 42 15.5 42 H17 L15.5 17 Z" fill="#7EB8E8"/>
-      <path d="M36 17 L34.5 40 C34.5 41.1 33.6 42 32.5 42 H31 L32.5 17 Z" fill="#7EB8E8"/>
-      {/* Бумаги торчат из корзины */}
-      <rect x="16" y="11" width="7" height="14" rx="1" fill="white" stroke="#C8C8C8" strokeWidth="0.7" transform="rotate(-10 19 17)"/>
-      <rect x="22" y="10" width="7" height="14" rx="1" fill="white" stroke="#C8C8C8" strokeWidth="0.7"/>
-      <rect x="26" y="12" width="7" height="13" rx="1" fill="white" stroke="#C8C8C8" strokeWidth="0.7" transform="rotate(8 30 18)"/>
-      {/* Крышка открыта (наклонена) */}
-      <path d="M9 16 L24 12 L39 16 L38 19 L24 15 L10 19 Z" fill="#9ECEF0"/>
-      <rect x="9" y="16" width="30" height="3" rx="1" fill="#BDD9F0"/>
-      {/* Ручка */}
-      <path d="M18 12 V9 C18 8.4 18.4 8 19 8 H29 C29.6 8 30 8.4 30 9 V12"
-        fill="none" stroke="#7EB8E8" strokeWidth="2.2"/>
-      {/* Линии на корзине */}
-      <line x1="20" y1="21" x2="19.2" y2="39" stroke="#7EB8E8" strokeWidth="1.2"/>
-      <line x1="24" y1="21" x2="24"   y2="39" stroke="#7EB8E8" strokeWidth="1.2"/>
-      <line x1="28" y1="21" x2="28.8" y2="39" stroke="#7EB8E8" strokeWidth="1.2"/>
+      <path d="M11.5 18 L13.2 41 C13.2 41.6 13.7 42 14.3 42 H33.7 C34.3 42 34.8 41.6 34.8 41 L36.5 18 Z"
+        fill="url(#binBodyGrad2)"/>
+      <path d="M11.5 18 L13.2 41 C13.2 41.6 13.7 42 14.3 42 H16 L14.3 18Z" fill="#6BAED6" opacity="0.5"/>
+      <path d="M36.5 18 L34.8 41 C34.8 41.6 34.3 42 33.7 42 H32 L33.7 18Z" fill="#6BAED6" opacity="0.5"/>
+      {/* Рёбра */}
+      <line x1="20" y1="21" x2="19.3" y2="40" stroke="#5A9CC5" strokeWidth="1.2" opacity="0.7"/>
+      <line x1="24" y1="21" x2="24"   y2="40" stroke="#5A9CC5" strokeWidth="1.2" opacity="0.7"/>
+      <line x1="28" y1="21" x2="28.7" y2="40" stroke="#5A9CC5" strokeWidth="1.2" opacity="0.7"/>
     </svg>
   )
 
-  /* ── PNG / IMAGE — Windows 10 Photos app icon style ── */
+  /* ── PNG / IMAGE — реальная иконка Windows 10 Photos ── */
   if (type === 'img') return (
-    <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
-      {/* Фон страницы */}
-      <rect x="4" y="4" width="40" height="40" rx="2" fill="white" stroke="#D4D4D4" strokeWidth="0.8"/>
-      {/* Загнутый угол */}
-      <path d="M30 4 L44 18 L30 18 Z" fill="#E8E8E8"/>
-      <path d="M30 4 H44 V18" fill="none" stroke="#D4D4D4" strokeWidth="0.8"/>
-      {/* Цветная картинка внутри — Windows Photos стиль */}
-      <rect x="7" y="20" width="34" height="22" rx="1.5" fill="#E8F4FC"/>
-      {/* Небо */}
-      <rect x="7" y="20" width="34" height="10" rx="1.5" fill="#87CEEB"/>
-      {/* Горы */}
-      <path d="M7 36 L17 24 L24 30 L30 22 L41 36 Z" fill="#5D9B4A"/>
-      <path d="M7 36 L17 24 L21 28 Z" fill="#78B85F"/>
-      {/* Солнце */}
-      <circle cx="37" cy="24" r="4" fill="#FFD700"/>
-      {/* Надпись .PNG */}
-      <rect x="7" y="7" width="18" height="8" rx="1" fill="#0078D4"/>
-      <text x="10" y="14" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Segoe UI,Arial">.PNG</text>
-    </svg>
+    <img src={`${BASE}assets/icon-photos.png`} width={s} height={s}
+      style={{ objectFit:'contain', imageRendering:'auto' }} alt="photo" />
   )
 
-  /* ── MP3 / AUDIO — Windows 10 Groove Music icon style ── */
+  /* ── MP3 / AUDIO — реальная иконка Windows 10 Groove Music ── */
   if (type === 'audio') return (
-    <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
-      {/* Фон страницы */}
-      <rect x="4" y="4" width="40" height="40" rx="2" fill="white" stroke="#D4D4D4" strokeWidth="0.8"/>
-      {/* Загнутый угол */}
-      <path d="M30 4 L44 18 L30 18 Z" fill="#E8E8E8"/>
-      <path d="M30 4 H44 V18" fill="none" stroke="#D4D4D4" strokeWidth="0.8"/>
-      {/* Оранжевый блок с нотой */}
-      <rect x="7" y="20" width="34" height="22" rx="1.5" fill="#FF8C00"/>
-      {/* Нота */}
-      <path d="M20 36 L20 26 L32 23 L32 33" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-      <circle cx="18" cy="37" r="3.5" fill="white"/>
-      <circle cx="30" cy="34" r="3.5" fill="white"/>
-      {/* Надпись .MP3 */}
-      <rect x="7" y="7" width="18" height="8" rx="1" fill="#FF8C00"/>
-      <text x="9" y="14" fontSize="6.5" fontWeight="bold" fill="white" fontFamily="Segoe UI,Arial">.MP3</text>
-    </svg>
+    <img src={`${BASE}assets/icon-music.png`} width={s} height={s}
+      style={{ objectFit:'contain', imageRendering:'auto' }} alt="music" />
   )
 
-  /* ── DOCX — точная копия иконки Microsoft Word 2019/365 ── */
+  /* ── DOCX — реальная иконка Microsoft Word ── */
   if (type === 'word') return (
-    <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
-      {/* Страница */}
-      <rect x="6" y="2" width="30" height="38" rx="2" fill="white" stroke="#D4D4D4" strokeWidth="0.8"/>
-      {/* Загнутый угол */}
-      <path d="M28 2 L36 10 L28 10 Z" fill="#E0E0E0"/>
-      <path d="M28 2 H36 V10" fill="none" stroke="#D4D4D4" strokeWidth="0.8"/>
-      {/* Строки текста */}
-      <line x1="10" y1="18" x2="32" y2="18" stroke="#E0E0E0" strokeWidth="1.5"/>
-      <line x1="10" y1="22" x2="32" y2="22" stroke="#E0E0E0" strokeWidth="1.5"/>
-      <line x1="10" y1="26" x2="32" y2="26" stroke="#E0E0E0" strokeWidth="1.5"/>
-      <line x1="10" y1="30" x2="24" y2="30" stroke="#E0E0E0" strokeWidth="1.5"/>
-      {/* Word значок-плашка поверх */}
-      <rect x="2" y="28" width="32" height="20" rx="3" fill="#2B579A"/>
-      {/* Буква W — официальный стиль Microsoft */}
-      <text x="6" y="44" fontSize="17" fontWeight="bold" fill="white"
-        fontFamily="Segoe UI,Arial,sans-serif">W</text>
-      {/* Синяя полоса сверху */}
-      <rect x="2" y="28" width="32" height="5" rx="3" fill="#1E4078"/>
-      <text x="6" y="44" fontSize="17" fontWeight="bold" fill="white"
-        fontFamily="Segoe UI,Arial,sans-serif">W</text>
-    </svg>
+    <img src={`${BASE}assets/icon-word.png`} width={s} height={s}
+      style={{ objectFit:'contain', imageRendering:'auto' }} alt="word" />
   )
 
-  /* ── TXT — Windows 10 Notepad icon ── */
+  /* ── TXT — реальная иконка Windows 10 Notepad ── */
   if (type === 'txt') return (
-    <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
-      {/* Страница */}
-      <rect x="6" y="4" width="30" height="40" rx="2" fill="white" stroke="#C8C8C8" strokeWidth="1"/>
-      {/* Загнутый уголок */}
-      <path d="M28 4 L36 12" stroke="#C0C0C0" strokeWidth="1"/>
-      <path d="M28 4 L28 12 L36 12" fill="#E8E8E8" stroke="#C8C8C8" strokeWidth="1"/>
-      {/* Синяя линейка Блокнота */}
-      <rect x="6" y="4" width="22" height="6" rx="2" fill="#0078D4"/>
-      <rect x="6" y="7" width="22" height="3" fill="#005A9E"/>
-      {/* Текстовые строки */}
-      <line x1="10" y1="18" x2="32" y2="18" stroke="#A0A0A0" strokeWidth="1.4"/>
-      <line x1="10" y1="23" x2="32" y2="23" stroke="#A0A0A0" strokeWidth="1.4"/>
-      <line x1="10" y1="28" x2="32" y2="28" stroke="#A0A0A0" strokeWidth="1.4"/>
-      <line x1="10" y1="33" x2="26" y2="33" stroke="#A0A0A0" strokeWidth="1.4"/>
-      {/* Курсор (мигающий) */}
-      <rect x="26" y="30" width="2" height="5" rx="1" fill="#0078D4"/>
-      {/* Надпись .TXT */}
-      <rect x="26" y="37" width="16" height="8" rx="1.5" fill="#0078D4"/>
-      <text x="28.5" y="43.5" fontSize="5.5" fontWeight="bold" fill="white" fontFamily="Segoe UI,Arial">.TXT</text>
-    </svg>
+    <img src={`${BASE}assets/icon-notepad.png`} width={s} height={s}
+      style={{ objectFit:'contain', imageRendering:'auto' }} alt="notepad" />
   )
 
   return <span style={{ fontSize: s * 0.7 }}>📄</span>
@@ -749,13 +709,19 @@ export default function PracticeSimulator({ name, onFinish }) {
         <button className="w-10 h-12 flex items-center justify-center hover:bg-white/10 transition-colors text-white/70 text-sm">
           ⊡
         </button>
-        {/* Pinned apps */}
+        {/* Pinned apps — реальные иконки Win10 */}
         <div className="flex items-center gap-0.5 ml-1">
-          {[['📁','Проводник'],['🌐','Edge'],['🛒','Магазин'],['⚙️','Параметры']].map(([ic, label]) => (
+          {[
+            [`${BASE}assets/icon-explorer.png`, 'Проводник'],
+            [`${BASE}assets/icon-edge.png`,     'Edge'],
+            [`${BASE}assets/icon-store.png`,    'Магазин'],
+            [`${BASE}assets/icon-settings.png`, 'Параметры'],
+            [`${BASE}assets/icon-media.png`,    'Медиа'],
+          ].map(([src, label]) => (
             <button key={label} title={label}
-              className="w-10 h-12 flex items-center justify-center hover:bg-white/10 transition-colors text-xl"
+              className="w-10 h-12 flex items-center justify-center hover:bg-white/10 transition-colors"
               onClick={e => { e.stopPropagation(); showToast(`Открываю ${label}...`) }}>
-              {ic}
+              <img src={src} alt={label} style={{ width:26, height:26, objectFit:'contain' }}/>
             </button>
           ))}
         </div>
