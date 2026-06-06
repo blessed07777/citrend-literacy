@@ -9,10 +9,18 @@ import { Logo, getBadge } from './shared'
 
 const PHASES = ['welcome', 'slides', 'practice', 'quiz', 'results']
 
+// Slides with fixed-position children (practice) must NOT use translateX —
+// a CSS transform on a parent breaks position:fixed children (they become relative to the parent).
+// Use opacity-only for those phases.
 const page = {
   initial: { opacity: 0, x: 40 },
   animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
   exit:    { opacity: 0, x: -40, transition: { duration: 0.25 } },
+}
+const pageFade = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.3 } },
+  exit:    { opacity: 0,  transition: { duration: 0.2 } },
 }
 
 export default function App() {
@@ -75,7 +83,10 @@ export default function App() {
         <TopBar name={childName} phaseIndex={phaseIndex} />
       )}
       <AnimatePresence mode="wait">
-        <motion.div key={phase} variants={page} initial="initial" animate="animate" exit="exit">
+        {/* practice/quiz use fixed children — only fade, no translateX */}
+        <motion.div key={phase}
+          variants={['practice','quiz'].includes(phase) ? pageFade : page}
+          initial="initial" animate="animate" exit="exit">
           {phase === 'welcome'   && <WelcomeScreen onStart={startLesson} />}
           {phase === 'slides'    && <InteractiveSlides name={childName} onFinish={finishSlides} />}
           {phase === 'practice'  && <PracticeSimulator name={childName} onFinish={finishPractice} />}
