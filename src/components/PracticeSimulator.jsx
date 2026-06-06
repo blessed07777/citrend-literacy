@@ -240,56 +240,142 @@ function Win10Wallpaper() {
 }
 
 /* ──────────────────────────────────────────
-   WIN10 CONTEXT MENU
+   WIN10 CONTEXT MENU — точная копия как на скриншоте из презентации
+   Refs: image22.jpeg (desktop right-click) & image30.jpeg (explorer)
 ────────────────────────────────────────── */
+
+/* Маленькие SVG-иконки Windows 10 shell style */
+const ShellIcon = ({ name }) => {
+  const icons = {
+    view: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="0.5" fill="#555"/><rect x="9" y="1" width="6" height="6" rx="0.5" fill="#555"/><rect x="1" y="9" width="6" height="6" rx="0.5" fill="#555"/><rect x="9" y="9" width="6" height="6" rx="0.5" fill="#555"/></svg>,
+    sort: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="1" y1="4" x2="11" y2="4" stroke="#555" strokeWidth="1.5"/><line x1="1" y1="8" x2="8" y2="8" stroke="#555" strokeWidth="1.5"/><line x1="1" y1="12" x2="5" y2="12" stroke="#555" strokeWidth="1.5"/><path d="M13 2 L13 13 M10.5 10.5 L13 13 L15.5 10.5" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>,
+    refresh: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 8 A5.5 5.5 0 1 1 8 13.5" stroke="#555" strokeWidth="1.5" strokeLinecap="round" fill="none"/><path d="M2.5 5 L2.5 8 L5.5 8" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>,
+    paste: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="5" width="9" height="10" rx="1" stroke="#555" strokeWidth="1.2" fill="none"/><path d="M6 5 V4 Q6 2 8 2 Q10 2 10 4 V5" stroke="#555" strokeWidth="1.2" fill="none"/><line x1="6" y1="8" x2="11" y2="8" stroke="#555" strokeWidth="1"/><line x1="6" y1="10" x2="11" y2="10" stroke="#555" strokeWidth="1"/><line x1="6" y1="12" x2="9" y2="12" stroke="#555" strokeWidth="1"/></svg>,
+    shortcut: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="10" height="10" rx="1" stroke="#555" strokeWidth="1.2" fill="none"/><path d="M7 1 L15 1 L15 9 M15 1 L9 7" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>,
+    undo: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 6.5 A6 5.5 0 0 1 13.5 8.5" stroke="#555" strokeWidth="1.5" strokeLinecap="round" fill="none"/><path d="M1.5 3 L1.5 6.5 L5 6.5" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>,
+    newitem: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="13" height="10" rx="1" fill="#FFD166"/><path d="M1 5 H7 L9 7.5 H14 C14.6 7.5 15 7.9 15 8.5 V14.2 C15 14.7 14.6 15 14 15 H1" fill="#FFD166"/><rect x="1" y="7.5" width="14" height="7.5" rx="1" fill="#FFE08A"/><line x1="7" y1="11" x2="7" y2="15" stroke="#C87D0E" strokeWidth="1.2"/><line x1="5" y1="13" x2="9" y2="13" stroke="#C87D0E" strokeWidth="1.2"/></svg>,
+    display: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="9" rx="1" stroke="#0078D4" strokeWidth="1.3" fill="none"/><rect x="2" y="3" width="12" height="7" rx="0.5" fill="#50B4D8" opacity="0.4"/><line x1="5.5" y1="11" x2="5.5" y2="13" stroke="#0078D4" strokeWidth="1.3"/><line x1="10.5" y1="11" x2="10.5" y2="13" stroke="#0078D4" strokeWidth="1.3"/><line x1="4" y1="13" x2="12" y2="13" stroke="#0078D4" strokeWidth="1.3"/></svg>,
+    personalize: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M11 1 L15 5 L6 14 C4.5 14 2 12.5 2 11 Z" stroke="#0078D4" strokeWidth="1.2" fill="#D0E8FF"/><line x1="9" y1="3" x2="13" y2="7" stroke="#0078D4" strokeWidth="1"/><circle cx="3.5" cy="12.5" r="1.5" fill="#0078D4"/></svg>,
+    open: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4 H6 L8 6 H14 C14.6 6 15 6.4 15 7 V13 C15 13.6 14.6 14 14 14 H2 C1.4 14 1 13.6 1 13 V5 C1 4.4 1.4 4 2 4Z" fill="#FFD166" stroke="#C87D0E" strokeWidth="0.8"/></svg>,
+    copy: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="4" width="10" height="10" rx="1" stroke="#555" strokeWidth="1.2" fill="white"/><rect x="2" y="2" width="10" height="10" rx="1" stroke="#555" strokeWidth="1.2" fill="white"/></svg>,
+    cut: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="4" cy="12" r="2.5" stroke="#555" strokeWidth="1.2" fill="none"/><circle cx="12" cy="12" r="2.5" stroke="#555" strokeWidth="1.2" fill="none"/><line x1="8" y1="6" x2="4" y2="12" stroke="#555" strokeWidth="1.2"/><line x1="8" y1="6" x2="12" y2="12" stroke="#555" strokeWidth="1.2"/><line x1="6" y1="2" x2="10" y2="6" stroke="#555" strokeWidth="1.2"/></svg>,
+    delete: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="5" width="8" height="10" rx="1" stroke="#555" strokeWidth="1.2" fill="none"/><line x1="2" y1="5" x2="14" y2="5" stroke="#555" strokeWidth="1.2"/><path d="M6 3 H10 C10 2.4 9.6 2 9 2 H7 C6.4 2 6 2.4 6 3Z" fill="#555"/><line x1="7" y1="8" x2="7" y2="12" stroke="#555" strokeWidth="1"/><line x1="9" y1="8" x2="9" y2="12" stroke="#555" strokeWidth="1"/></svg>,
+    rename: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12 L12 2 L14 4 L4 14Z" stroke="#555" strokeWidth="1.2" fill="none"/><line x1="1" y1="14" x2="5" y2="14" stroke="#555" strokeWidth="1.2"/></svg>,
+    props: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#555" strokeWidth="1.2" fill="none"/><line x1="5" y1="6" x2="11" y2="6" stroke="#555" strokeWidth="1.2"/><line x1="5" y1="9" x2="11" y2="9" stroke="#555" strokeWidth="1.2"/><circle cx="5" cy="6" r="0.8" fill="#555"/><circle cx="5" cy="9" r="0.8" fill="#555"/></svg>,
+    // New submenu icons
+    folder_new: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 4 H5.5 L7 6 H14 C14.6 6 15 6.4 15 7 V13 C15 13.6 14.6 14 14 14 H2 C1.4 14 1 13.6 1 13 V4Z" fill="#FFD166"/><rect x="1" y="6.5" width="14" height="7.5" rx="1" fill="#FFE08A"/></svg>,
+    bitmap: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="1" fill="#E8E8E8" stroke="#999" strokeWidth="1"/><path d="M1 9 L5 6 L9 9 L12 7 L15 9" stroke="#4A90D9" strokeWidth="1" fill="none"/><circle cx="12" cy="5" r="2" fill="#FFD700"/></svg>,
+    word_s: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" fill="#2B579A"/><text x="3" y="13" fontSize="11" fontWeight="bold" fill="white" fontFamily="Arial">W</text></svg>,
+    ppt: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" fill="#B7472A"/><text x="3.5" y="13" fontSize="11" fontWeight="bold" fill="white" fontFamily="Arial">P</text></svg>,
+    rtf: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="10" height="13" rx="1" fill="white" stroke="#999" strokeWidth="1"/><path d="M12 1 L12 5 L15 5" stroke="#999" strokeWidth="1" fill="none"/><path d="M12 1 L15 5 L15 14 H2" stroke="#999" strokeWidth="1" fill="none"/><line x1="4" y1="6" x2="10" y2="6" stroke="#888" strokeWidth="0.8"/><line x1="4" y1="8" x2="10" y2="8" stroke="#888" strokeWidth="0.8"/><line x1="4" y1="10" x2="8" y2="10" stroke="#888" strokeWidth="0.8"/></svg>,
+    txt_s: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="10" height="13" rx="1" fill="white" stroke="#999" strokeWidth="1"/><path d="M12 1 L12 5 L15 5" stroke="#999" strokeWidth="1" fill="none"/><path d="M12 1 L15 5 L15 14 H2" stroke="#999" strokeWidth="1" fill="none"/></svg>,
+    excel: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" fill="#217346"/><text x="3.5" y="13" fontSize="11" fontWeight="bold" fill="white" fontFamily="Arial">X</text></svg>,
+    zip: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 4 H5.5 L7 6 H14 C14.6 6 15 6.4 15 7 V13 C15 13.6 14.6 14 14 14 H2 C1.4 14 1 13.6 1 13 V4Z" fill="#FFD166"/><rect x="1" y="6.5" width="14" height="7.5" rx="1" fill="#FFE08A"/><rect x="6" y="1" width="4" height="8" fill="#FFD166" stroke="#C87D0E" strokeWidth="0.7"/><line x1="7" y1="3" x2="9" y2="3" stroke="#C87D0E" strokeWidth="0.8"/><line x1="7" y1="5" x2="9" y2="5" stroke="#C87D0E" strokeWidth="0.8"/></svg>,
+  }
+  return icons[name] || null
+}
+
+const SEG = 'Segoe UI,system-ui,sans-serif'
+
 function Win10CtxMenu({ menu, onCreateFolder, onPaste, onRefresh, onClose }) {
+  const [showNewSub, setShowNewSub] = useState(false)
   if (!menu) return null
-  const Item = ({ icon, label, shortcut, onClick, divider, sub }) => divider
-    ? <div style={{ height:1, background:'#e5e5e5', margin:'4px 0' }}/>
-    : (
-      <button onClick={() => { onClick?.(); onClose() }}
-        className="w-full text-left flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-[#0078d4] hover:text-white transition-colors rounded-sm"
-        style={{ fontFamily:'Segoe UI,system-ui,sans-serif', fontSize:13, color:'#1a1a1a' }}>
-        <span className="w-5 text-base">{icon}</span>
-        <span className="flex-1">{label}</span>
-        {shortcut && <span className="opacity-50 text-xs">{shortcut}</span>}
-        {sub && <span className="opacity-50">›</span>}
+
+  const menuStyle = {
+    background:'#f2f2f2', border:'1px solid #999',
+    borderRadius:0, padding:'2px 0', minWidth:204,
+    boxShadow:'4px 4px 8px rgba(0,0,0,0.28)',
+    fontFamily:SEG, fontSize:12, color:'#000',
+    userSelect:'none',
+  }
+
+  const Divider = () => (
+    <div style={{ height:1, background:'#c8c8c8', margin:'2px 0' }}/>
+  )
+
+  const Item = ({ iconName, label, shortcut, onClick, sub, onHover, onLeave, disabled }) => {
+    const [hov, setHov] = useState(false)
+    return (
+      <button
+        disabled={disabled}
+        onMouseEnter={() => { setHov(true); onHover?.() }}
+        onMouseLeave={() => { setHov(false); onLeave?.() }}
+        onClick={() => { if (!disabled) { onClick?.(); if (!sub) onClose() } }}
+        style={{
+          display:'flex', alignItems:'center', width:'100%', padding:'3px 6px 3px 4px',
+          background: hov && !disabled ? '#316AC5' : 'transparent',
+          color: hov && !disabled ? 'white' : disabled ? '#888' : '#000',
+          border:'none', cursor: disabled ? 'default' : 'pointer',
+          fontFamily:SEG, fontSize:12, gap:0, textAlign:'left',
+        }}>
+        {/* Icon area 20px */}
+        <span style={{ width:20, height:20, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginRight:2 }}>
+          {iconName && <ShellIcon name={iconName}/>}
+        </span>
+        <span style={{ flex:1, padding:'0 2px' }}>{label}</span>
+        {shortcut && <span style={{ color: hov ? 'rgba(255,255,255,0.75)' : '#666', marginLeft:20, fontSize:12 }}>{shortcut}</span>}
+        {sub && <span style={{ marginLeft:4, fontSize:12 }}>►</span>}
       </button>
     )
+  }
+
+  // Clamp position to stay in viewport
+  const vw = window.innerWidth, vh = window.innerHeight
+  const mx = Math.min(menu.x, vw - 220)
+  const my = Math.min(menu.y, vh - 260)
 
   return (
     <>
-      <div className="fixed inset-0 z-40" onClick={onClose}/>
-      <div style={{
-        position:'fixed', left: menu.x, top: menu.y, zIndex:50,
-        background:'#f9f9f9', border:'1px solid #e0e0e0',
-        borderRadius:4, padding:'4px 0', minWidth:200,
-        boxShadow:'0 8px 32px rgba(0,0,0,0.22)',
-        fontFamily:'Segoe UI,system-ui,sans-serif',
-      }}>
-        {menu.target === 'desktop' ? <>
-          <Item icon="👁️" label="Вид" sub />
-          <Item icon="↕️" label="Сортировать" sub />
-          <Item icon="🔄" label="Обновить" onClick={onRefresh}/>
-          <Item divider />
-          <Item icon="📋" label="Вставить" onClick={onPaste}/>
-          <Item icon="✂️" label="Вставить ярлык"/>
-          <Item icon="↩️" label="Отменить удаление" shortcut="Ctrl+Z"/>
-          <Item divider />
-          <Item icon="➕" label="Создать" sub onClick={onCreateFolder}/>
-          <Item divider />
-          <Item icon="🖥️" label="Параметры экрана"/>
-          <Item icon="🎨" label="Персонализация"/>
-        </> : <>
-          <Item icon="📂" label="Открыть"/>
-          <Item icon="📋" label="Копировать" shortcut="Ctrl+C"/>
-          <Item icon="✂️" label="Вырезать" shortcut="Ctrl+X"/>
-          <Item divider />
-          <Item icon="🗑️" label="Удалить" shortcut="Del"/>
-          <Item icon="✏️" label="Переименовать"/>
-          <Item divider />
-          <Item icon="🔧" label="Свойства"/>
-        </>}
+      <div className="fixed inset-0 z-40" onClick={onClose} onContextMenu={e=>{e.preventDefault();onClose()}}/>
+      <div style={{ position:'fixed', left:mx, top:my, zIndex:50, ...menuStyle }}>
+        {menu.target === 'desktop' ? (
+          <>
+            <Item iconName="view"    label="View"           sub />
+            <Item iconName="sort"    label="Sort by"        sub />
+            <Item iconName="refresh" label="Refresh"        onClick={onRefresh}/>
+            <Divider/>
+            <Item iconName="paste"    label="Paste"          onClick={onPaste}/>
+            <Item iconName="shortcut" label="Paste shortcut"/>
+            <Item iconName="undo"     label="Undo Delete"    shortcut="Ctrl+Z"/>
+            <Divider/>
+            <Item iconName="newitem"  label="New"            sub
+              onHover={() => setShowNewSub(true)}
+              onLeave={() => setTimeout(() => setShowNewSub(false), 300)}
+              onClick={() => setShowNewSub(s => !s)}/>
+            {showNewSub && (
+              <div style={{ position:'absolute', left:204, top:112, zIndex:51, ...menuStyle }}
+                onMouseEnter={() => setShowNewSub(true)}
+                onMouseLeave={() => setTimeout(() => setShowNewSub(false), 200)}>
+                <Item iconName="folder_new" label="Folder"                          onClick={() => { onCreateFolder(); setShowNewSub(false) }}/>
+                <Item iconName="shortcut"   label="Shortcut"/>
+                <Divider/>
+                <Item iconName="bitmap"  label="Bitmap image"/>
+                <Item iconName="word_s"  label="Microsoft Word Document"/>
+                <Item iconName="ppt"     label="Microsoft PowerPoint Presentation"/>
+                <Item iconName="rtf"     label="Rich Text Format"/>
+                <Item iconName="txt_s"   label="Text Document"/>
+                <Item iconName="excel"   label="Microsoft Excel Worksheet"/>
+                <Item iconName="zip"     label="Compressed (zipped) Folder"/>
+              </div>
+            )}
+            <Divider/>
+            <Item iconName="display"     label="Display settings"/>
+            <Item iconName="personalize" label="Personalize"/>
+          </>
+        ) : (
+          <>
+            <Item iconName="open"   label="Open"/>
+            <Divider/>
+            <Item iconName="copy"   label="Copy"     shortcut="Ctrl+C"/>
+            <Item iconName="cut"    label="Cut"      shortcut="Ctrl+X"/>
+            <Item iconName="paste"  label="Paste"    shortcut="Ctrl+V" onClick={onPaste}/>
+            <Divider/>
+            <Item iconName="delete" label="Delete"   shortcut="Del"/>
+            <Item iconName="rename" label="Rename"/>
+            <Divider/>
+            <Item iconName="props"  label="Properties"/>
+          </>
+        )}
       </div>
     </>
   )
