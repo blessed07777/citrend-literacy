@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const BASE = import.meta.env.BASE_URL
-const SEG = 'Segoe UI,system-ui,sans-serif'
+const SEG = 'Segoe UI, system-ui, Tahoma, sans-serif'
 
 /* ══════════════════════════════════════════
    FILE SYSTEM STATE
@@ -62,13 +62,7 @@ const TASKS = [
 function FileIcon({ type, size = 40 }) {
   const s = size
   if (type === 'folder') return (
-    <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
-      <path d="M4 38 V17 C4 15.9 4.9 15 6 15 H20 L24 19 H42 C43.1 19 44 19.9 44 21 V38 C44 39.1 43.1 40 42 40 H6 C4.9 40 4 39.1 4 38Z" fill="#C87D0E"/>
-      <path d="M4 15 H20 L24 19 H4Z" fill="#BA720C"/>
-      <rect x="4" y="21" width="40" height="19" rx="1.5" fill="#FFD166"/>
-      <rect x="4" y="21" width="40" height="6" rx="1.5" fill="#FFE08A" opacity="0.7"/>
-      <rect x="4" y="35" width="40" height="5" rx="1.5" fill="#E8B83A"/>
-    </svg>
+    <img src={`${BASE}assets/win-folder_colored.svg`} width={s} height={s} style={{objectFit:'contain'}} alt="folder"/>
   )
   if (type === 'pc') return (
     <svg width={s} height={s} viewBox="0 0 48 48" fill="none">
@@ -138,10 +132,12 @@ function FileIcon({ type, size = 40 }) {
       <line x1="28" y1="21" x2="28.7" y2="40" stroke="#5A9CC5" strokeWidth="1.2" opacity="0.7"/>
     </svg>
   )
-  if (type === 'img')   return <img src={`${BASE}assets/icon-photos.png`}  width={s} height={s} style={{objectFit:'contain'}} alt="photo"/>
-  if (type === 'audio') return <img src={`${BASE}assets/icon-music.png`}   width={s} height={s} style={{objectFit:'contain'}} alt="music"/>
-  if (type === 'word')  return <img src={`${BASE}assets/icon-word.png`}    width={s} height={s} style={{objectFit:'contain'}} alt="word"/>
-  if (type === 'txt')   return <img src={`${BASE}assets/icon-notepad.png`} width={s} height={s} style={{objectFit:'contain'}} alt="notepad"/>
+  if (type === 'img')        return <img src={`${BASE}assets/icon-photos.png`}  width={s} height={s} style={{objectFit:'contain'}} alt="photo"/>
+  if (type === 'audio')      return <img src={`${BASE}assets/win-music-icon_colored.svg`}   width={s} height={s} style={{objectFit:'contain'}} alt="music"/>
+  if (type === 'word')       return <img src={`${BASE}assets/icon-word.png`}    width={s} height={s} style={{objectFit:'contain'}} alt="word"/>
+  if (type === 'txt')        return <img src={`${BASE}assets/win-notepad-icon_colored.svg`} width={s} height={s} style={{objectFit:'contain'}} alt="notepad"/>
+  if (type === 'calculator') return <img src={`${BASE}assets/win-calculator_colored.svg`}  width={s} height={s} style={{objectFit:'contain'}} alt="calculator"/>
+  if (type === 'settings')   return <img src={`${BASE}assets/win-settings-icon_colored.svg`} width={s} height={s} style={{objectFit:'contain'}} alt="settings"/>
   return <span style={{fontSize:s*0.7}}>📄</span>
 }
 
@@ -160,23 +156,38 @@ function Win10Wallpaper({ which }) {
     return <div className="absolute inset-0" style={{background: WALLPAPERS[which]}}/>
   }
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{background:'#e8e4f3'}}>
+    <div className="absolute inset-0 overflow-hidden" style={{background:'#ddd8f0'}}>
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
         <defs>
-          <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#c7b8ea" stopOpacity="0.6"/>
-            <stop offset="100%" stopColor="#7b6be4" stopOpacity="0.95"/>
+          <linearGradient id="wg0" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#e8e4f8"/>
+            <stop offset="100%" stopColor="#c5bce8"/>
           </linearGradient>
-          <linearGradient id="wg2" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#9b8fd4" stopOpacity="0.5"/>
-            <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.4"/>
+          <linearGradient id="wg1" x1="30%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.85"/>
+            <stop offset="60%" stopColor="#6d28d9" stopOpacity="0.95"/>
+            <stop offset="100%" stopColor="#4c1d95" stopOpacity="1"/>
+          </linearGradient>
+          <linearGradient id="wg2" x1="50%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.7"/>
+            <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.9"/>
+          </linearGradient>
+          <linearGradient id="wg3" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#c4b5fd" stopOpacity="0.5"/>
+            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.3"/>
           </linearGradient>
         </defs>
-        <path d="M 1440 0 C 1100 0, 820 180, 920 420 C 1020 660, 740 780, 980 900 L 1440 900 Z" fill="url(#wg1)"/>
-        <path d="M 1440 120 C 1160 80, 900 280, 1000 500 C 1100 720, 860 840, 1100 900 L 1440 900 Z" fill="url(#wg2)"/>
-        <path d="M 1440 250 C 1200 220, 1050 380, 1120 580 C 1190 780, 1000 880, 1200 900 L 1440 900 Z" fill="white" opacity="0.12"/>
+        {/* base tint */}
+        <rect width="1440" height="900" fill="url(#wg0)"/>
+        {/* main large wave sweeping from right */}
+        <path d="M 780 -20 C 950 60, 1100 0, 1200 150 C 1320 320, 1160 500, 1280 680 C 1380 820, 1440 780, 1440 900 L 1440 0 Z" fill="url(#wg1)"/>
+        {/* secondary wave */}
+        <path d="M 950 -20 C 1080 80, 1240 40, 1340 200 C 1420 340, 1300 520, 1380 700 C 1420 800, 1440 860, 1440 900 L 1440 0 Z" fill="url(#wg2)" opacity="0.6"/>
+        {/* soft highlight curve */}
+        <path d="M 1100 0 C 1200 80, 1350 60, 1420 180 C 1440 230, 1440 280, 1440 340 L 1440 0 Z" fill="white" opacity="0.1"/>
+        {/* lower left soft wash */}
+        <path d="M 0 600 C 200 520, 500 680, 700 900 L 0 900 Z" fill="url(#wg3)" opacity="0.4"/>
       </svg>
-      <div className="absolute inset-0" style={{backgroundImage:'radial-gradient(circle, rgba(123,107,228,0.07) 1px, transparent 1px)',backgroundSize:'32px 32px'}}/>
     </div>
   )
 }
@@ -338,26 +349,28 @@ function DraggableWindow({ win, onClose, onMinimize, onMaximize, onFocus, onMove
     ? { position:'fixed', left:0, top:0, width:'100vw', height:'calc(100vh - 48px)', zIndex:win.z }
     : { position:'fixed', left:win.x, top:win.y, width:win.w, height:win.h, zIndex:win.z }
 
+  const titlebarH = 30
+
   return (
     <motion.div initial={{scale:0.95,opacity:0}} animate={{scale:1,opacity:1}} exit={{scale:0.95,opacity:0}}
       style={{...style, boxShadow:'0 8px 40px rgba(0,0,0,0.4)', borderRadius:2, overflow:'hidden', border:'1px solid #c0c0c0'}}
       onMouseDown={() => onFocus(win.id)}>
-      {/* Accent line */}
-      <div style={{height:3,background:'linear-gradient(90deg,#7b6be4,#a78bfa)'}}/>
       {/* Titlebar */}
       <div onMouseDown={onMouseDown} style={{
-        background:'#f3f3f3', height:32, display:'flex', alignItems:'center',
-        padding:'0 8px', cursor:'grab', userSelect:'none',
-        borderBottom:'1px solid #e0e0e0', fontFamily:SEG, fontSize:13,
+        background:'#f3f3f3', height:titlebarH, display:'flex', alignItems:'center',
+        padding:'0 0 0 8px', cursor:'grab', userSelect:'none',
+        borderBottom:'1px solid #e0e0e0', fontFamily:SEG, fontSize:12,
       }}>
-        <span style={{marginRight:6,fontSize:15}}>{win.icon}</span>
-        <span style={{flex:1,color:'#1a1a1a',fontWeight:400,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{win.title}</span>
-        <WinTitleBtn label="—" onClick={() => onMinimize(win.id)} hoverBg="#e5e5e5"/>
-        <WinTitleBtn label="□" onClick={() => onMaximize(win.id)} hoverBg="#e5e5e5"/>
-        <WinTitleBtn label="✕" onClick={() => onClose(win.id)} hoverBg="#c42b1c" hoverColor="white"/>
+        {typeof win.icon === 'string'
+          ? <span style={{marginRight:6,fontSize:14,lineHeight:1}}>{win.icon}</span>
+          : <span style={{marginRight:6,display:'flex',alignItems:'center'}}>{win.icon}</span>}
+        <span style={{flex:1,color:'#1a1a1a',fontWeight:400,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:12}}>{win.title}</span>
+        <WinTitleBtn label="—" onClick={() => onMinimize(win.id)} hoverBg="rgba(0,0,0,0.1)"/>
+        <WinTitleBtn label="□" onClick={() => onMaximize(win.id)} hoverBg="rgba(0,0,0,0.1)"/>
+        <WinTitleBtn label="✕" onClick={() => onClose(win.id)} hoverBg="#C42B1C" hoverColor="white"/>
       </div>
       {/* Content */}
-      <div style={{height: win.maximized ? 'calc(100vh - 48px - 35px)' : win.h - 35, background:'white', overflow:'auto', fontFamily:SEG}}>
+      <div style={{height: win.maximized ? 'calc(100vh - 48px - 30px)' : win.h - 30, background:'white', overflow:'auto', fontFamily:SEG}}>
         {children}
       </div>
     </motion.div>
@@ -369,7 +382,10 @@ function WinTitleBtn({ label, onClick, hoverBg, hoverColor }) {
   return (
     <button onClick={onClick}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{width:46,height:32,border:'none',cursor:'pointer',fontSize:label==='□'?13:16,color:hov&&hoverColor?hoverColor:'#555',background:hov?hoverBg:'transparent'}}>
+      style={{width:46,height:30,border:'none',cursor:'pointer',fontSize:label==='□'?12:14,
+        color: hov && hoverColor ? hoverColor : '#555',
+        background: hov ? hoverBg : 'transparent',
+        fontFamily:SEG, display:'flex', alignItems:'center', justifyContent:'center'}}>
       {label}
     </button>
   )
@@ -859,75 +875,179 @@ function WinLogo({ size = 24 }) {
 /* ══════════════════════════════════════════
    START MENU
 ══════════════════════════════════════════ */
+const TILE_COLORS = {
+  photos:     'linear-gradient(135deg, #0099BC, #005B9A)',
+  edge:       'linear-gradient(135deg, #0F7B6C, #087163)',
+  notepad:    '#2d7d9a',
+  calculator: '#1c1c1c',
+  explorer:   '#FFB900',
+  settings:   '#737373',
+  store:      'linear-gradient(135deg, #005FB8, #0078D4)',
+  calendar:   '#0078D4',
+  mail:       '#0E72C7',
+  weather:    'linear-gradient(135deg, #4DB8FF, #0066CC)',
+}
+
+function LiveTile({ id, label, bg, icon, size = 1, onClick }) {
+  const [hov, setHov] = useState(false)
+  const tileSize = 84
+  const gap = 4
+  const w = size === 2 ? tileSize * 2 + gap : tileSize
+  const h = size === 2 ? tileSize * 2 + gap : tileSize
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        width:w, height:h, background:bg,
+        border:'none', borderRadius:2, cursor:'pointer',
+        display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+        gap:6, padding:8, flexShrink:0,
+        filter: hov ? 'brightness(1.15)' : 'brightness(1)',
+        transition:'filter 0.12s', position:'relative', overflow:'hidden',
+      }}>
+      <span style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
+        {icon}
+      </span>
+      <span style={{
+        color:'white', fontSize:10, fontFamily:SEG, fontWeight:400,
+        textAlign:'center', lineHeight:1.2, textShadow:'0 1px 2px rgba(0,0,0,0.3)',
+      }}>{label}</span>
+    </button>
+  )
+}
+
 function StartMenu({ onClose, onOpenApp, recentFiles }) {
-  const PINNED = [
-    { id:'notepad',    icon:<img src={`${BASE}assets/icon-notepad.png`} width={32} height={32} style={{objectFit:'contain'}}/>,  label:'Блокнот' },
-    { id:'calculator', icon:'🧮',                                                                                                 label:'Калькулятор' },
-    { id:'edge',       icon:<img src={`${BASE}assets/icon-edge.png`} width={32} height={32} style={{objectFit:'contain'}}/>,     label:'Edge' },
-    { id:'settings',   icon:<img src={`${BASE}assets/icon-settings.png`} width={32} height={32} style={{objectFit:'contain'}}/>, label:'Параметры' },
-    { id:'explorer',   icon:<img src={`${BASE}assets/icon-explorer.png`} width={32} height={32} style={{objectFit:'contain'}}/>, label:'Проводник' },
-    { id:'store',      icon:<img src={`${BASE}assets/icon-store.png`} width={32} height={32} style={{objectFit:'contain'}}/>,    label:'Магазин' },
-    { id:'photos',     icon:'📷', label:'Камера' },
-    { id:'music',      icon:'🎵', label:'Музыка' },
-    { id:'maps',       icon:'🗺️', label:'Карты' },
-    { id:'trash',      icon:'🗑️', label:'Корзина' },
-  ]
+  const ALL_APPS = [
+    'Adobe Acrobat', 'Calendar', 'Camera', 'Edge', 'Excel',
+    'File Explorer', 'Mail', 'Maps', 'Notepad', 'OneDrive',
+    'Paint', 'Photos', 'PowerPoint', 'Settings', 'Skype',
+    'Store', 'Weather', 'Word', 'Xbox', 'Calculator',
+  ].sort()
+
+  const iconSize = 28
+
   return (
     <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0,y:12}}
       onClick={e=>e.stopPropagation()}
       style={{
-        position:'fixed',bottom:50,left:0,width:600,zIndex:100,
-        background:'rgba(32,32,32,0.97)',backdropFilter:'blur(20px)',
-        boxShadow:'0 -4px 40px rgba(0,0,0,0.6)',borderRadius:'0 8px 0 0',
-        fontFamily:SEG,overflow:'hidden',
+        position:'fixed', bottom:48, left:0, width:680, zIndex:100,
+        background:'transparent',
+        boxShadow:'0 -4px 40px rgba(0,0,0,0.7)', borderRadius:'0 4px 0 0',
+        fontFamily:SEG, overflow:'hidden', display:'flex', userSelect:'none',
       }}>
-      {/* Search */}
-      <div style={{padding:'16px 20px 8px'}}>
-        <div style={{background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.15)',
-          borderRadius:20,padding:'8px 16px',display:'flex',alignItems:'center',gap:8}}>
-          <span>🔍</span>
-          <span style={{color:'rgba(255,255,255,0.45)',fontSize:13}}>Поиск приложений, настроек и файлов</span>
+
+      {/* ── LEFT COLUMN ── */}
+      <div style={{
+        width:240, background:'#1f1f1f', display:'flex', flexDirection:'column',
+        borderRight:'1px solid rgba(255,255,255,0.06)',
+      }}>
+        {/* User avatar */}
+        <div style={{padding:'16px 16px 12px', display:'flex', alignItems:'center', gap:10, borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+          <div style={{width:36,height:36,borderRadius:'50%',background:'linear-gradient(135deg,#7b6be4,#a78bfa)',
+            display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>👤</div>
+          <div>
+            <div style={{color:'white',fontSize:13,fontWeight:600}}>Ученик</div>
+            <div style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>Локальная учётная запись</div>
+          </div>
+        </div>
+
+        {/* All apps list */}
+        <div style={{flex:1, overflowY:'auto', padding:'8px 0'}}>
+          <div style={{padding:'4px 16px 2px',fontSize:10,color:'rgba(255,255,255,0.35)',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em'}}>
+            Все приложения
+          </div>
+          {ALL_APPS.map((app) => {
+            const letter = app[0].toUpperCase()
+            const prevApp = ALL_APPS[ALL_APPS.indexOf(app)-1]
+            const showLetter = !prevApp || prevApp[0].toUpperCase() !== letter
+            return (
+              <div key={app}>
+                {showLetter && (
+                  <div style={{padding:'6px 16px 2px',fontSize:10,color:'rgba(255,255,255,0.3)',fontWeight:700,letterSpacing:'0.08em'}}>
+                    {letter}
+                  </div>
+                )}
+                <button
+                  style={{display:'flex',alignItems:'center',gap:10,width:'100%',padding:'6px 16px',
+                    background:'none',border:'none',cursor:'pointer',color:'rgba(255,255,255,0.8)',fontSize:12,fontFamily:SEG,textAlign:'left'}}
+                  onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.08)'}
+                  onMouseOut={e=>e.currentTarget.style.background='none'}
+                  onClick={() => {
+                    const map = { 'Notepad':'notepad','Calculator':'calculator','File Explorer':'explorer','Settings':'settings','Photos':'photos' }
+                    if (map[app]) { onOpenApp(map[app]); onClose() } else onClose()
+                  }}>
+                  <span style={{fontSize:14,flexShrink:0}}>📄</span>
+                  {app}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Bottom buttons */}
+        <div style={{borderTop:'1px solid rgba(255,255,255,0.06)', padding:'8px 0'}}>
+          <button onClick={()=>{onOpenApp('settings');onClose()}}
+            style={{display:'flex',alignItems:'center',gap:10,width:'100%',padding:'8px 16px',
+              background:'none',border:'none',cursor:'pointer',color:'rgba(255,255,255,0.75)',fontSize:12,fontFamily:SEG}}
+            onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.08)'}
+            onMouseOut={e=>e.currentTarget.style.background='none'}>
+            <img src={`${BASE}assets/win-settings-icon_colored.svg`} width={16} height={16} style={{objectFit:'contain'}}/>
+            Параметры
+          </button>
+          <button
+            style={{display:'flex',alignItems:'center',gap:10,width:'100%',padding:'8px 16px',
+              background:'none',border:'none',cursor:'pointer',color:'rgba(255,255,255,0.75)',fontSize:12,fontFamily:SEG}}
+            onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.08)'}
+            onMouseOut={e=>e.currentTarget.style.background='none'}>
+            <img src={`${BASE}assets/win-power_colored.svg`} width={16} height={16} style={{objectFit:'contain'}}/>
+            Завершение работы
+          </button>
         </div>
       </div>
-      {/* Pinned */}
-      <div style={{padding:'8px 20px'}}>
-        <div style={{color:'rgba(255,255,255,0.5)',fontSize:12,fontWeight:600,marginBottom:10}}>Закреплённые</div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:4}}>
-          {PINNED.map(p => (
-            <button key={p.id} onClick={()=>{ onOpenApp(p.id); onClose() }}
-              style={{background:'none',border:'none',cursor:'pointer',padding:'10px 4px',
-                display:'flex',flexDirection:'column',alignItems:'center',gap:6,borderRadius:6,color:'white'}}
-              onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.1)'}
-              onMouseOut={e=>e.currentTarget.style.background='none'}>
-              <span style={{fontSize:typeof p.icon==='string'?28:undefined}}>{p.icon}</span>
-              <span style={{fontSize:11,textAlign:'center',lineHeight:1.2}}>{p.label}</span>
-            </button>
-          ))}
+
+      {/* ── RIGHT TILE AREA ── */}
+      <div style={{flex:1, background:'rgba(28,28,28,0.97)', padding:'16px 14px', overflowY:'auto'}}>
+        <div style={{color:'rgba(255,255,255,0.45)',fontSize:11,fontWeight:600,marginBottom:10,letterSpacing:'0.06em',textTransform:'uppercase'}}>
+          Жизнь на плитке
         </div>
-      </div>
-      {/* Recommended */}
-      <div style={{padding:'8px 20px 12px',borderTop:'1px solid rgba(255,255,255,0.08)'}}>
-        <div style={{color:'rgba(255,255,255,0.5)',fontSize:12,fontWeight:600,marginBottom:8}}>Рекомендуемые</div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:6}}>
-          {recentFiles.slice(0,4).map(f => (
-            <div key={f.id} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 10px',borderRadius:4,cursor:'pointer',color:'rgba(255,255,255,0.8)',fontSize:12}}
-              onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.08)'}
-              onMouseOut={e=>e.currentTarget.style.background='transparent'}>
-              <FileIcon type={f.icon} size={24}/>
-              <span>{f.name}</span>
-            </div>
-          ))}
-          {recentFiles.length === 0 && <span style={{color:'rgba(255,255,255,0.3)',fontSize:12,gridColumn:'span 2'}}>Недавно открытых файлов нет</span>}
+        {/* Tiles grid */}
+        <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+          {/* Photos 2x2 */}
+          <LiveTile id="photos" label="Фото" bg={TILE_COLORS.photos} size={2}
+            icon={<img src={`${BASE}assets/icon-photos.png`} width={42} height={42} style={{objectFit:'contain'}}/>}
+            onClick={()=>{onOpenApp('photos');onClose()}}/>
+          {/* Weather 2x2 */}
+          <LiveTile id="weather" label="Погода" bg={TILE_COLORS.weather} size={2}
+            icon={<span style={{fontSize:36}}>⛅</span>}
+            onClick={onClose}/>
+          {/* Row of 1x1 tiles */}
+          <LiveTile id="edge" label="Edge" bg={TILE_COLORS.edge}
+            icon={<img src={`${BASE}assets/icon-edge.png`} width={36} height={36} style={{objectFit:'contain'}}/>}
+            onClick={()=>{onOpenApp('edge');onClose()}}/>
+          <LiveTile id="notepad" label="Блокнот" bg={TILE_COLORS.notepad}
+            icon={<img src={`${BASE}assets/win-notepad-icon_colored.svg`} width={36} height={36} style={{objectFit:'contain',filter:'brightness(0) invert(1)'}}/>}
+            onClick={()=>{onOpenApp('notepad');onClose()}}/>
+          <LiveTile id="mail" label="Почта" bg={TILE_COLORS.mail}
+            icon={<span style={{fontSize:32}}>✉️</span>}
+            onClick={onClose}/>
+          <LiveTile id="calendar" label="Календарь" bg={TILE_COLORS.calendar}
+            icon={<span style={{fontSize:32}}>📅</span>}
+            onClick={onClose}/>
+          <LiveTile id="calculator" label="Калькулятор" bg={TILE_COLORS.calculator}
+            icon={<img src={`${BASE}assets/win-calculator_colored.svg`} width={36} height={36} style={{objectFit:'contain',filter:'brightness(0) invert(1)'}}/>}
+            onClick={()=>{onOpenApp('calculator');onClose()}}/>
+          <LiveTile id="explorer" label="Проводник" bg={TILE_COLORS.explorer}
+            icon={<img src={`${BASE}assets/win-folder_colored.svg`} width={36} height={36} style={{objectFit:'contain'}}/>}
+            onClick={()=>{onOpenApp('explorer');onClose()}}/>
+          <LiveTile id="settings" label="Параметры" bg={TILE_COLORS.settings}
+            icon={<img src={`${BASE}assets/win-settings-icon_colored.svg`} width={36} height={36} style={{objectFit:'contain',filter:'brightness(0) invert(1)'}}/>}
+            onClick={()=>{onOpenApp('settings');onClose()}}/>
+          <LiveTile id="store" label="Магазин" bg={TILE_COLORS.store}
+            icon={<img src={`${BASE}assets/icon-store.png`} width={36} height={36} style={{objectFit:'contain'}}/>}
+            onClick={()=>{onOpenApp('store');onClose()}}/>
         </div>
-      </div>
-      {/* User row */}
-      <div style={{borderTop:'1px solid rgba(255,255,255,0.1)',padding:'12px 20px',display:'flex',alignItems:'center',gap:10}}>
-        <div style={{width:36,height:36,borderRadius:'50%',background:'linear-gradient(135deg,#7b6be4,#a78bfa)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>👤</div>
-        <div>
-          <div style={{color:'white',fontSize:13,fontWeight:600}}>Ученик</div>
-          <div style={{color:'rgba(255,255,255,0.4)',fontSize:11}}>Локальная учётная запись</div>
-        </div>
-        <button onClick={onClose} style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'rgba(255,255,255,0.5)',fontSize:20}}>⏻</button>
       </div>
     </motion.div>
   )
@@ -1060,11 +1180,11 @@ export default function Win10Sandbox({ name, onFinish }) {
   const openApp = (appName, extraState = {}) => {
     const z = zCounter + 1; setZCounter(z)
     const configs = {
-      notepad:    { title:'Блокнот',         icon:'📝', w:560, h:420, x:120+windows.length*20, y:60+windows.length*20 },
-      explorer:   { title:'Проводник',       icon:<img src={`${BASE}assets/icon-explorer.png`} width={16} height={16} style={{objectFit:'contain'}}/>, w:720, h:500, x:100, y:50 },
-      calculator: { title:'Калькулятор',     icon:'🧮', w:320, h:500, x:300, y:80 },
-      settings:   { title:'Параметры',       icon:<img src={`${BASE}assets/icon-settings.png`} width={16} height={16} style={{objectFit:'contain'}}/>, w:680, h:520, x:120, y:60 },
-      thispc:     { title:'Этот компьютер',  icon:'💻', w:720, h:500, x:100, y:50 },
+      notepad:    { title:'Блокнот',         icon:<img src={`${BASE}assets/win-notepad-icon_colored.svg`} width={16} height={16} style={{objectFit:'contain'}}/>, w:560, h:420, x:120+windows.length*20, y:60+windows.length*20 },
+      explorer:   { title:'Проводник',       icon:<img src={`${BASE}assets/win-folder_colored.svg`} width={16} height={16} style={{objectFit:'contain'}}/>, w:720, h:500, x:100, y:50 },
+      calculator: { title:'Калькулятор',     icon:<img src={`${BASE}assets/win-calculator_colored.svg`} width={16} height={16} style={{objectFit:'contain'}}/>, w:320, h:500, x:300, y:80 },
+      settings:   { title:'Параметры',       icon:<img src={`${BASE}assets/win-settings-icon_colored.svg`} width={16} height={16} style={{objectFit:'contain'}}/>, w:680, h:520, x:120, y:60 },
+      thispc:     { title:'Этот компьютер',  icon:<img src={`${BASE}assets/win-desktop-icon_colored.svg`} width={16} height={16} style={{objectFit:'contain'}}/>, w:720, h:500, x:100, y:50 },
       trash:      { title:'Корзина',         icon:'🗑️', w:600, h:460, x:140, y:70 },
     }
     const cfg = configs[appName] || { title:appName, icon:'📄', w:560, h:400, x:150, y:80 }
@@ -1280,44 +1400,76 @@ export default function Win10Sandbox({ name, onFinish }) {
         {/* Task View */}
         <button style={{width:40,height:48,display:'flex',alignItems:'center',justifyContent:'center',border:'none',background:'transparent',cursor:'pointer',color:'rgba(255,255,255,0.7)',fontSize:16}}>⊡</button>
         {/* Pinned apps */}
-        <div style={{display:'flex',alignItems:'center',gap:1,marginLeft:4}}>
+        <div style={{display:'flex',alignItems:'center',gap:0,marginLeft:2}}>
           {[
-            { id:'explorer', src:`${BASE}assets/icon-explorer.png`, label:'Проводник' },
-            { id:'edge',     src:`${BASE}assets/icon-edge.png`,     label:'Edge' },
-            { id:'store',    src:`${BASE}assets/icon-store.png`,    label:'Магазин' },
-            { id:'settings', src:`${BASE}assets/icon-settings.png`, label:'Параметры' },
-          ].map(app => (
-            <button key={app.id} title={app.label}
-              style={{width:40,height:48,display:'flex',alignItems:'center',justifyContent:'center',border:'none',background:'transparent',cursor:'pointer'}}
-              onClick={e=>{e.stopPropagation();handleOpenApp(app.id)}}
-              onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.1)'}
-              onMouseOut={e=>e.currentTarget.style.background='transparent'}>
-              <img src={app.src} alt={app.label} style={{width:26,height:26,objectFit:'contain'}}/>
-            </button>
-          ))}
+            { id:'explorer', src:`${BASE}assets/win-folder_colored.svg`,         label:'Проводник' },
+            { id:'edge',     src:`${BASE}assets/icon-edge.png`,                   label:'Edge' },
+            { id:'store',    src:`${BASE}assets/icon-store.png`,                  label:'Магазин' },
+            { id:'settings', src:`${BASE}assets/win-settings-icon_colored.svg`,   label:'Параметры' },
+          ].map(app => {
+            const isRunning = windows.some(w => w.app === app.id)
+            const isActive  = windows.some(w => w.app === app.id && w.id === activeWinId && !w.minimized)
+            return (
+              <button key={app.id} title={app.label}
+                style={{width:44,height:48,display:'flex',alignItems:'center',justifyContent:'center',border:'none',background:'transparent',cursor:'pointer',
+                  position:'relative', flexDirection:'column', gap:0}}
+                onClick={e=>{e.stopPropagation();handleOpenApp(app.id)}}
+                onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.1)'}
+                onMouseOut={e=>e.currentTarget.style.background='transparent'}>
+                <img src={app.src} alt={app.label} style={{width:20,height:20,objectFit:'contain'}}/>
+                {/* Running indicator */}
+                {isRunning && (
+                  <div style={{position:'absolute',bottom:2,left:'50%',transform:'translateX(-50%)',
+                    width: isActive ? 24 : 6, height:2, borderRadius:1,
+                    background: isActive ? '#60a5fa' : 'rgba(255,255,255,0.5)',
+                    transition:'width 0.15s'}}/>
+                )}
+              </button>
+            )
+          })}
         </div>
+        {/* Divider */}
+        <div style={{width:1,height:28,background:'rgba(255,255,255,0.12)',margin:'0 4px'}}/>
         {/* citrend logo */}
-        <div style={{marginLeft:4,paddingLeft:8,borderLeft:'1px solid rgba(255,255,255,0.1)',display:'flex',alignItems:'center'}}>
-          <img src={`${BASE}assets/logo.png`} alt="citrend" style={{height:22,objectFit:'contain',opacity:0.7}}/>
+        <div style={{paddingLeft:4,paddingRight:4,display:'flex',alignItems:'center'}}>
+          <img src={`${BASE}assets/logo.png`} alt="citrend" style={{height:20,objectFit:'contain',opacity:0.65}}/>
         </div>
+        {/* Divider */}
+        <div style={{width:1,height:28,background:'rgba(255,255,255,0.12)',margin:'0 4px'}}/>
         {/* Running windows */}
-        <div style={{display:'flex',alignItems:'center',gap:2,marginLeft:8,flex:1,overflow:'hidden'}}>
-          {windows.map(win => (
-            <button key={win.id}
-              onClick={e=>{e.stopPropagation(); win.minimized ? (restoreWin(win.id),focusWin(win.id)) : (win.id===activeWinId ? minimizeWin(win.id) : focusWin(win.id))}}
-              style={{
-                display:'flex',alignItems:'center',gap:6,height:48,padding:'0 10px',
-                border:'none',background:'transparent',cursor:'pointer',
-                borderBottom: win.id===activeWinId&&!win.minimized ? '2px solid #8b5cf6' : '2px solid transparent',
-                color:'rgba(255,255,255,0.85)',fontSize:12,fontFamily:SEG,
-                opacity:win.minimized?0.5:1,
-              }}
-              onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.1)'}
-              onMouseOut={e=>e.currentTarget.style.background='transparent'}>
-              <span style={{fontSize:14}}>{typeof win.icon==='string'?win.icon:'📄'}</span>
-              <span style={{maxWidth:80,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{win.title}</span>
-            </button>
-          ))}
+        <div style={{display:'flex',alignItems:'center',gap:1,marginLeft:2,flex:1,overflow:'hidden'}}>
+          {windows.map(win => {
+            const isActive = win.id === activeWinId && !win.minimized
+            // pick a small icon src if possible
+            const iconSrcMap = {
+              explorer: `${BASE}assets/win-folder_colored.svg`,
+              settings: `${BASE}assets/win-settings-icon_colored.svg`,
+              notepad:  `${BASE}assets/win-notepad-icon_colored.svg`,
+              calculator: `${BASE}assets/win-calculator_colored.svg`,
+            }
+            const iconSrc = iconSrcMap[win.app]
+            return (
+              <button key={win.id}
+                onClick={e=>{e.stopPropagation(); win.minimized ? (restoreWin(win.id),focusWin(win.id)) : (win.id===activeWinId ? minimizeWin(win.id) : focusWin(win.id))}}
+                style={{
+                  display:'flex',alignItems:'center',gap:6,height:48,padding:'0 10px',
+                  border:'none',background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
+                  cursor:'pointer', position:'relative',
+                  color:'rgba(255,255,255,0.85)',fontSize:12,fontFamily:SEG,
+                  opacity:win.minimized?0.5:1, minWidth:0,
+                }}
+                onMouseOver={e=>e.currentTarget.style.background= isActive ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)'}
+                onMouseOut={e=>e.currentTarget.style.background= isActive ? 'rgba(255,255,255,0.12)' : 'transparent'}>
+                {iconSrc
+                  ? <img src={iconSrc} alt="" style={{width:16,height:16,objectFit:'contain',flexShrink:0}}/>
+                  : <span style={{fontSize:13,flexShrink:0}}>{typeof win.icon==='string'?win.icon:'📄'}</span>}
+                <span style={{maxWidth:80,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{win.title}</span>
+                {/* Active underline */}
+                <div style={{position:'absolute',bottom:0,left:4,right:4,height:2,borderRadius:1,
+                  background: isActive ? '#60a5fa' : win.minimized ? 'rgba(255,255,255,0.3)' : 'transparent'}}/>
+              </button>
+            )
+          })}
         </div>
         {/* System tray */}
         <div style={{display:'flex',alignItems:'center',gap:2,paddingRight:4,marginLeft:'auto'}}>
